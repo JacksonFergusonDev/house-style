@@ -20,7 +20,10 @@ export function castOptions(settings?: { reduceMotion?: boolean }): CastOptions;
 export function loadSymbolsFont(): Promise<FontFace[]>;
 
 /** Creates the player for an element's `data-asciinema` recording, once. */
-export function mountCast<Player>(
+export function mountCast<Player extends {
+  seek(time: number): Promise<unknown>;
+  play(): Promise<unknown>;
+}>(
   create: (src: string, element: HTMLElement, options: Record<string, unknown>) => Player,
   element: HTMLElement,
   options?: Record<string, unknown>,

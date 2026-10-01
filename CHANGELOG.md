@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+- Prepare recording previews with a seek instead of a timed poster. The prompt and initial output now remain visible during the first playback, including recordings whose first frame is at time zero. Programmatic playback waits for the preview to finish; reduced-motion readers still get a paused preview.
+
 ## 1.2.0
 
 - `GUIDELINES.md`: rules for documentation sites. Only top-level pages carry a navigation icon, cards at the top of a page are optional and come in twos, fours, or sixes, every page has a description, and terminal output is shown in the house window.

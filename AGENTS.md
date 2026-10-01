@@ -12,3 +12,14 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 - **Icons live in `icons/`**: 24px line icons with a 1.5 stroke, and brand icons from Font Awesome Free. Add a new icon to `css/icons.css` too.
 - **Version every change.** Bump `version` in `package.json`, add a `CHANGELOG.md` entry, and tag `vX.Y.Z`. A renamed or removed class, token, icon, or function is a major version. A visible change to a value is at least a minor one.
 - **Never hard-wrap Markdown prose.**
+
+## Releasing a change to the sites
+
+No site picks up a change here until it moves to the new tag. After tagging, open one pull request per site:
+
+| Site | Repository | How it pins house-style | To move it to a new tag |
+| --- | --- | --- | --- |
+| jacksonferguson.me | `JacksonFergusonDev/JacksonFergusonDev.github.io` | `"house-style": "github:JacksonFergusonDev/house-style#vX.Y.Z"` in `package.json` | `npm install --save github:JacksonFergusonDev/house-style#vX.Y.Z`, then check its computed styles are unchanged unless the change meant to restyle it |
+| protostar.jacksonferguson.me | `JacksonFergusonDev/protostar` | `HOUSE_STYLE_TAG` in `scripts/sync_house_style.py`, vendored into `docs/house/` | Change the tag, run `just sync-house-style`, and commit `docs/house/`; CI fails until the copy matches the tag |
+
+A new site that adopts house-style adds a row here, and its own `AGENTS.md` says how it pins the tag and that shared styles change here, not in the site.

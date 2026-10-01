@@ -1,0 +1,166 @@
+/*
+ * An install command with a package-manager toggle and a copy button:
+ *
+ *   <div class="hs-install-header">
+ *     <span class="hs-install-label">Install globally</span>
+ *     <div class="hs-install-toggle" role="tablist" aria-label="Installation method">
+ *       <button type="button" role="tab" aria-selected="true" class="hs-install-tab is-active"
+ *         aria-controls="tool-install" data-command="uv tool install tool">uv</button>
+ *       <button type="button" role="tab" aria-selected="false" class="hs-install-tab"
+ *         aria-controls="tool-install" data-command="brew install tool">brew</button>
+ *     </div>
+ *   </div>
+ *   <div class="hs-install" id="tool-install" aria-label="Install command">
+ *     <code>uv tool install tool</code>
+ *     <button type="button" class="hs-install-copy" data-copy="uv tool install tool"
+ *       aria-label="Copy install command">Copy<span class="hs-install-copy-long"> command</span></button>
+ *   </div>
+ *
+ * js/copy-command.js wires the tabs and the button.
+ */
+.hs-install-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 32rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.hs-install-label {
+  color: #81929b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+.hs-install-toggle {
+  display: inline-flex;
+  gap: 3px;
+  background: #090e11;
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: 2px;
+}
+.hs-install-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 3px 9px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+.hs-install-tab:hover {
+  color: var(--text);
+}
+.hs-install-tab.is-active {
+  background: #151d24;
+  border-color: #2d3c43;
+  color: var(--accent);
+  font-weight: 600;
+}
+.hs-install-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.hs-install {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  max-width: 32rem;
+  min-height: 48px;
+  overflow: hidden;
+  border: 1px solid var(--code-border);
+  border-radius: var(--code-radius);
+  background: var(--code-bg);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+.hs-install:focus-within {
+  border-color: var(--accent);
+}
+.hs-install code {
+  padding: 0.75rem 0.9rem;
+  color: var(--code-fg);
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  transition: color 0.25s ease;
+}
+.hs-install code::-webkit-scrollbar {
+  display: none;
+}
+.hs-install code::before {
+  margin-right: 0.6rem;
+  color: var(--prompt);
+  content: '$';
+  transition: color 0.25s ease;
+}
+.hs-install-copy {
+  align-self: stretch;
+  min-width: 7.25rem;
+  border: 0;
+  border-left: 1px solid var(--code-border);
+  color: #000;
+  background: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.25s ease;
+}
+.hs-install-copy:hover {
+  background: #00e5ff;
+}
+.hs-install-copy:active {
+  background: #00b4d8;
+}
+.hs-install-copy:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -2px;
+}
+@media (max-width: 800px) {
+  .hs-install-copy-long {
+    display: none;
+  }
+  .hs-install-copy {
+    min-width: 3.5rem;
+  }
+  .hs-install code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 560px) {
+  .hs-install-header {
+    margin: 18px 0 6px;
+    max-width: 100%;
+  }
+  .hs-install {
+    max-width: 100%;
+    min-height: 42px;
+  }
+  .hs-install code {
+    font-size: 0.72rem;
+    padding: 0.6rem 0.7rem;
+  }
+  .hs-install code::before {
+    margin-right: 0.4rem;
+  }
+  .hs-install-copy {
+    min-width: 3.5rem;
+    padding: 0 0.6rem;
+    font-size: 0.7rem;
+  }
+}

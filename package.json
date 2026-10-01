@@ -1,0 +1,25 @@
+{
+  "name": "house-style",
+  "version": "1.0.0",
+  "description": "Shared tokens, fonts, components, and scripts for jacksonferguson.me and its project sites",
+  "license": "MIT",
+  "author": "Jackson Ferguson",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JacksonFergusonDev/house-style.git"
+  },
+  "type": "module",
+  "exports": {
+    "./css/*": "./css/*",
+    "./js/*": "./js/*",
+    "./fonts/*": "./fonts/*"
+  },
+  "files": [
+    "css",
+    "js",
+    "fonts"
+  ],
+  "sideEffects": [
+    "*.css"
+  ]
+}

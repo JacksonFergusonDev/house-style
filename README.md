@@ -14,10 +14,12 @@ Sites never load these files from here at runtime. Each one copies a tagged rele
 | `css/components.css` | `.hs-section-marker` and `.hs-button` (with `.hs-button--primary`). |
 | `css/terminal.css` | `.hs-terminal`, the window recordings and screenshots sit in, and the asciinema-player skin. |
 | `css/install.css` | `.hs-install`, an install command with a package-manager toggle and a copy button. |
+| `css/icons.css` | `.hs-icon hs-icon-<name>`: the icons in `icons/`, drawn in the text's color for pages that can't inline SVG. |
+| `icons/*.svg` | The house icons: arrows and other line icons, brand marks, and the jacksonferguson.me mark. |
 | `js/copy-command.js` | `initCopyCommands(root)`: wires the install box's tabs and copy buttons. |
 | `js/cast.js` | `castOptions()`, `mountCast(create, element)`, `loadSymbolsFont()`, `whenVisible(element, callback)`: plays a recording in a terminal window. |
 
-Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
+[GUIDELINES.md](GUIDELINES.md) holds the design rules every site follows, such as which arrow a link takes; each site's `AGENTS.md` points at the copy it uses. Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
 
 Load the CSS in this order, before a site's own styles: `fonts.css`, `tokens.css`, then any components. The files are plain CSS and ES modules with no build step.
 

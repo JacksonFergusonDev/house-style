@@ -53,6 +53,10 @@
   -webkit-mask-image: url('../icons/brand-linkedin.svg');
   mask-image: url('../icons/brand-linkedin.svg');
 }
+.hs-icon-brand-pypi {
+  -webkit-mask-image: url('../icons/brand-pypi.svg');
+  mask-image: url('../icons/brand-pypi.svg');
+}
 .hs-icon-close {
   -webkit-mask-image: url('../icons/close.svg');
   mask-image: url('../icons/close.svg');

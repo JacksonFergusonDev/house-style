@@ -1,4 +1,9 @@
 # Changelog
+ 
+## 1.4.0
+ 
+- `icons/brand-pypi.svg`: the PyPI mark from Simple Icons, and `.hs-icon-brand-pypi` in `css/icons.css`.
+- `GUIDELINES.md`: mention PyPI brand links.
 
 ## 1.3.0
 

@@ -4,7 +4,7 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 
 ## Rules for changing it
 
-- **[GUIDELINES.md](GUIDELINES.md) is the design contract.** Follow it in every file here, and change it here when a rule needs to change. Each site's `AGENTS.md` points at the copy it vendors.
+- **[GUIDELINES.md](GUIDELINES.md) is the design and writing contract.** Follow it in every file here, and change it here when a rule needs to change. Each site's `AGENTS.md` points at the copy it vendors.
 - **jacksonferguson.me is the reference.** A rule that came from the site keeps its exact values. Before releasing a change, check that the site renders identically, unless the change is meant to restyle it. Compare the computed style of every element, `::before` and `::after` included, across its pages at several widths.
 - **Plain files, no build step.** CSS is plain CSS, and scripts are ES modules that import nothing (pass a library in instead, as `mountCast(create, element)` does). Each script has a matching `.d.ts`.
 - **Prefix every class `hs-`** so it can't collide with a site's own styles or a documentation theme.

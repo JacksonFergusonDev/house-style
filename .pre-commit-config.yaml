@@ -1,0 +1,71 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
+default_stages:
+  - pre-commit
+
+repos:
+  # Generic hooks
+  - repo: builtin
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
+  # Formatting, linting, and JavaScript tests
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: npx --no-install prettier --write --ignore-unknown
+        language: system
+        require_serial: true
+        files: \.(js|ts|css|json|md|yaml|yml)$
+
+      - id: eslint
+        name: eslint
+        entry: npx --no-install eslint
+        language: system
+        require_serial: true
+        files: \.([jt]s|mjs|cjs)$
+
+      - id: stylelint
+        name: stylelint
+        entry: npx --no-install stylelint
+        language: system
+        require_serial: true
+        files: \.css$
+
+      - id: javascript-tests
+        name: JavaScript tests
+        entry: npm test
+        language: system
+        pass_filenames: false
+        files: ^(js/.*\.[jt]s|tests/.*\.js|package(-lock)?\.json)$
+
+  # Check for accidental commits of secrets
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Commit message validation
+  - repo: https://github.com/Goldziher/gitfluff
+    rev: v0.8.0
+    hooks:
+      - id: gitfluff-lint
+        args: [--write]
+        stages: [commit-msg]
+
+  # Markdown linting
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: v0.2.73
+    hooks:
+      - id: rumdl
+        args: [--fix]
+      - id: rumdl-fmt

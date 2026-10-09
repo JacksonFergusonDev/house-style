@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.2
+
+- Add ESLint, Prettier, and Stylelint configurations adapted from the personal site, and run them alongside the JavaScript tests in prek pre-commit hooks.
+
 ## 1.4.1
 
 - `GUIDELINES.md`: the Writing section is shorter and leads with its goal, readability. Bold marks what a reader scans for (labels, controls, defined terms) rather than only list labels, sentences may carry a supporting clause, and the only punctuation rule left is no em dashes.

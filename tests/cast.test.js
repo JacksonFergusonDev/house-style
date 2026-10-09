@@ -10,7 +10,9 @@ function recording() {
 
 test('first play waits for a real preview instead of clearing a timed poster', async () => {
   let finishPreview;
-  const preview = new Promise(resolve => { finishPreview = resolve; });
+  const preview = new Promise((resolve) => {
+    finishPreview = resolve;
+  });
   const calls = [];
   const element = recording();
   const player = mountCast((src, screen, options) => {
@@ -19,8 +21,14 @@ test('first play waits for a real preview instead of clearing a timed poster', a
     assert.equal('poster' in options, false);
     assert.equal(options.preload, true);
     return {
-      seek: time => { calls.push(['seek', time]); return preview; },
-      play: async () => { calls.push(['play']); return true; },
+      seek: (time) => {
+        calls.push(['seek', time]);
+        return preview;
+      },
+      play: async () => {
+        calls.push(['play']);
+        return true;
+      },
     };
   }, element);
   const playing = player.play();
@@ -29,24 +37,43 @@ test('first play waits for a real preview instead of clearing a timed poster', a
   assert.equal(await playing, true);
   await player.play();
   assert.deepEqual(calls, [['seek', 0.1], ['play'], ['play']]);
-  assert.equal(mountCast(() => assert.fail('mounted twice'), element), undefined);
+  assert.equal(
+    mountCast(() => assert.fail('mounted twice'), element),
+    undefined,
+  );
 });
 
 test('reduced motion keeps the real preview paused and disables looping', async () => {
   let plays = 0;
-  mountCast((src, element, options) => {
-    assert.equal(options.loop, false);
-    return { seek: async time => assert.equal(time, 0.1), play: async () => { plays++; } };
-  }, recording(), { loop: false });
+  mountCast(
+    (src, element, options) => {
+      assert.equal(options.loop, false);
+      return {
+        seek: async (time) => assert.equal(time, 0.1),
+        play: async () => {
+          plays++;
+        },
+      };
+    },
+    recording(),
+    { loop: false },
+  );
   await Promise.resolve();
   assert.equal(plays, 0);
 });
 
 test('explicit posters and autoplay remain under the caller’s control', () => {
   for (const overrides of [{ poster: 'data:text/plain,preview' }, { autoPlay: true }]) {
-    mountCast((src, element, options) => {
-      assert.equal(options.poster, overrides.poster ?? 'npt:0:00.1');
-      return { seek: () => assert.fail('unexpected seek'), play: () => assert.fail('unexpected play') };
-    }, recording(), overrides);
+    mountCast(
+      (src, element, options) => {
+        assert.equal(options.poster, overrides.poster ?? 'npt:0:00.1');
+        return {
+          seek: () => assert.fail('unexpected seek'),
+          play: () => assert.fail('unexpected play'),
+        };
+      },
+      recording(),
+      overrides,
+    );
   }
 });

@@ -48,6 +48,12 @@ The bundler copies the fonts and fingerprints them like any other asset.
 
 Vendor a tag into the docs with a sync script, as Protostar's `scripts/sync_house_style.py` does: it downloads the tag's `css/`, `js/`, and `fonts/` into `docs/house/`, and `--check` fails when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
 
+## Development checks
+
+Run `npm ci` to install the development tools, then `prek install` to install the pre-commit and commit-message hooks. Run `prek run --all-files` to check the whole repository. Pre-commit formats text with Prettier, lints JavaScript and declarations with ESLint, lints CSS with Stylelint, and runs the JavaScript tests.
+
+Run `npm run lint`, `npm run format:check`, or `npm test` to run the corresponding checks directly. These tools are development dependencies; the shared files still have no build step.
+
 ## Changing it
 
 1. Change the files, and check each site that uses them against the change.

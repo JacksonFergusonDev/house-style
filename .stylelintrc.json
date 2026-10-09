@@ -1,0 +1,36 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "ignoreFiles": ["node_modules/**"],
+  "rules": {
+    "rule-empty-line-before": null,
+    "at-rule-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "no-descending-specificity": null,
+    "media-feature-range-notation": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "color-function-alias-notation": null,
+    "color-hex-length": null,
+    "property-no-vendor-prefix": [
+      true,
+      {
+        "ignoreProperties": ["/^-webkit-mask-/"]
+      }
+    ],
+    "value-keyword-case": [
+      "lower",
+      {
+        "ignoreKeywords": ["currentColor"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["css/components.css"],
+      "rules": {
+        "selector-class-pattern": "^hs-[a-z0-9]+(?:-[a-z0-9]+)*(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$"
+      }
+    }
+  ]
+}

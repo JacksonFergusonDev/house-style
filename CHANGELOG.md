@@ -1,11 +1,15 @@
 # Changelog
- 
+
+## 1.4.1
+
+- `GUIDELINES.md`: the Writing section is shorter and leads with its goal, readability. Bold marks what a reader scans for (labels, controls, defined terms) rather than only list labels, sentences may carry a supporting clause, and the only punctuation rule left is no em dashes.
+
 ## 1.4.0
 
 - `GUIDELINES.md`: rules for writing. Every site speaks in one calm, clear, precise voice, and each page is written for one audience: General (homepages, project cards, READMEs, documentation landing pages), Users, or Technical. Documentation sites give each navigation section one audience and state each rule once.
 
 ## 1.3.1
- 
+
 - `icons/brand-python.svg`: the Python mark from Font Awesome, and `.hs-icon-brand-python` in `css/icons.css`.
 - `GUIDELINES.md`: mention Python brand links.
 

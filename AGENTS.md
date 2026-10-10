@@ -21,6 +21,6 @@ No site picks up a change here until it moves to the new tag. After tagging, ope
 | Site | Repository | How it pins house-style | To move it to a new tag |
 | --- | --- | --- | --- |
 | jacksonferguson.me | `JacksonFergusonDev/JacksonFergusonDev.github.io` | `"house-style": "github:JacksonFergusonDev/house-style#vX.Y.Z"` in `package.json` | `npm install --save github:JacksonFergusonDev/house-style#vX.Y.Z`, then check its computed styles are unchanged unless the change meant to restyle it |
-| protostar.jacksonferguson.me | `JacksonFergusonDev/protostar` | `HOUSE_STYLE_TAG` in `scripts/sync_house_style.py`, vendored into `docs/house/` | Change the tag, run `just sync-house-style`, and commit `docs/house/`; CI fails until the copy matches the tag |
+| protostar.jacksonferguson.me | `JacksonFergusonDev/protostar` | `house_style` in the `justfile`, vendored into `docs/house/` by this repository's `scripts/vendor.py` | Change the tag, run `just sync-house-style`, and commit `docs/house/`; CI fails until the copy matches the tag |
 
 A new site that adopts house-style adds a row here, and its own `AGENTS.md` says how it pins the tag and that shared styles change here, not in the site.

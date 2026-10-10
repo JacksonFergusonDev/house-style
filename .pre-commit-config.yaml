@@ -48,6 +48,13 @@ repos:
         pass_filenames: false
         files: ^(js/.*\.[jt]s|tests/.*\.js|package(-lock)?\.json)$
 
+      - id: python-tests
+        name: Python tests
+        entry: python3 -m unittest discover tests
+        language: system
+        pass_filenames: false
+        files: ^(scripts|tests)/.*\.py$
+
   # Check for accidental commits of secrets
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1

@@ -11,6 +11,7 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 - **Size in `px`, never `rem`.** Documentation themes change the root font size.
 - **Icons live in `icons/`**: 24px line icons with a 1.5 stroke, and brand icons from Font Awesome Free. Add a new icon to `css/icons.css` too.
 - **Version every change.** Bump `version` in `package.json`, add a `CHANGELOG.md` entry, and tag `vX.Y.Z`. A renamed or removed class, token, icon, or function is a major version. A visible change to a value is at least a minor one.
+- **`scripts/vendor.py` serves every site that vendors a release.** Keep it to Python's standard library so `uv run` can fetch it by URL in any repository. A site runs it from the tag it vendors, so a change to it ships in a release like any other file.
 - **Never hard-wrap Markdown prose.**
 
 ## Releasing a change to the sites

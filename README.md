@@ -46,13 +46,19 @@ The bundler copies the fonts and fingerprints them like any other asset.
 
 ### A documentation site without Node (Zensical, MkDocs)
 
-Vendor a tag into the docs with a sync script, as Protostar's `scripts/sync_house_style.py` does: it downloads the tag's `css/`, `js/`, and `fonts/` into `docs/house/`, and `--check` fails when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
+Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
+
+```sh
+uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v1.5.0/scripts/vendor.py --tag v1.5.0 docs/house
+```
+
+It writes the tag's CSS, scripts, fonts, icons, and guidelines into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
 
 ## Development checks
 
-Run `npm ci` to install the development tools, then `prek install` to install the pre-commit and commit-message hooks. Run `prek run --all-files` to check the whole repository. Pre-commit formats text with Prettier, lints JavaScript and declarations with ESLint, lints CSS with Stylelint, and runs the JavaScript tests.
+Run `npm ci` to install the development tools, then `prek install` to install the pre-commit and commit-message hooks. Run `prek run --all-files` to check the whole repository. Pre-commit formats text with Prettier, lints JavaScript and declarations with ESLint, lints CSS with Stylelint, and runs the JavaScript and Python tests.
 
-Run `npm run lint`, `npm run format:check`, or `npm test` to run the corresponding checks directly. These tools are development dependencies; the shared files still have no build step.
+Run `npm run lint`, `npm run format:check`, `npm test`, or `npm run test:python` to run the corresponding checks directly. `scripts/vendor.py` uses only Python's standard library. These tools are development dependencies; the shared files still have no build step.
 
 ## Changing it
 

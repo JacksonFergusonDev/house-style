@@ -32,7 +32,7 @@ Depend on a tag:
 
 ```json
 "dependencies": {
-  "house-style": "github:JacksonFergusonDev/house-style#v1.0.0"
+  "house-style": "github:JacksonFergusonDev/house-style#v1.6.0"
 }
 ```
 
@@ -50,7 +50,7 @@ The bundler copies the fonts and fingerprints them like any other asset.
 Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
 
 ```sh
-uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v1.5.0/scripts/vendor.py --tag v1.5.0 docs/house
+uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v1.6.0/scripts/vendor.py --tag v1.6.0 docs/house
 ```
 
 It writes the tag's CSS, scripts, fonts, icons, and guidelines into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.

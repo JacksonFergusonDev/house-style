@@ -10,7 +10,7 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 - **Prefix every class `hs-`** so it can't collide with a site's own styles or a documentation theme.
 - **Size in `px`, never `rem`.** Documentation themes change the root font size.
 - **Icons live in `icons/`**: 24px line icons with a 1.5 stroke, and brand icons from Font Awesome Free. Add a new icon to `css/icons.css` too.
-- **Version every change.** Bump `version` in `package.json`, add a `CHANGELOG.md` entry, and tag `vX.Y.Z`. A renamed or removed class, token, icon, or function is a major version. A visible change to a value is at least a minor one.
+- **Version each release.** Changes may accumulate under an `Unreleased` section in `CHANGELOG.md`. Before tagging a release, bump `version` in `package.json` and its lockfile, move those entries under the new version, and tag `vX.Y.Z`. Development tooling and contributor documentation changes do not require a release by themselves. Changes to shared assets, guidelines, or `scripts/vendor.py` reach consuming sites through a release. A renamed or removed class, token, icon, or function is a major version. A visible change to a value is at least a minor one; other backward-compatible fixes are patch versions.
 - **`scripts/vendor.py` serves every site that vendors a release.** Keep it to Python's standard library so `uv run` can fetch it by URL in any repository. A site runs it from the tag it vendors, so a change to it ships in a release like any other file.
 - **Never hard-wrap Markdown prose.**
 

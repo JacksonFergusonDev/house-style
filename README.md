@@ -121,8 +121,8 @@ These tools are development dependencies; the shared files still have no build s
 ## Changing it
 
 1. Change the files, and check each site that uses them against the change.
-1. Add the change to `CHANGELOG.md` and bump `version` in `package.json`.
-1. Tag the release (`git tag v1.1.0 && git push --tags`).
-1. Move each site to the new tag in its own pull request.
+1. Record changes in the `Unreleased` section of `CHANGELOG.md`. Several changes may share one release.
+1. When releasing, bump `version` in `package.json` and its lockfile, move the unreleased entries under the new version, and tag `vX.Y.Z`.
+1. Update a consuming site in its own pull request only when explicitly requested or when the release fixes an issue affecting that site.
 
-Bump the major version when a class, token, or function is renamed or removed, or when a value changes in a way a site would notice.
+Development tooling and contributor documentation changes do not require a release by themselves. Changes to shared assets, guidelines, or `scripts/vendor.py` reach consuming sites through a release. Renaming or removing a class, token, icon, or function requires a major version. A visible change to a value requires at least a minor version; other backward-compatible fixes use a patch version.

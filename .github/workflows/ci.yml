@@ -50,7 +50,9 @@ jobs:
           key: prek-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run the shared pre-commit checks
-        run: prek run --all-files --show-diff-on-failure
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          prek run --all-files --show-diff-on-failure
 
       - name: Upload browser traces on failure
         if: failure()

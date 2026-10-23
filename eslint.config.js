@@ -11,8 +11,12 @@ export default [
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['tests/**/*.js', '*.config.js'],
+    files: ['tests/**/*.js', 'browser-tests/**/*.js', '*.config.js'],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['browser-tests/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
     rules: {

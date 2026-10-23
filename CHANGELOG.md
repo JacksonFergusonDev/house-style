@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+- `css/product.css`: an optional shared navy palette for product sites and apps. Load it after `tokens.css`, then set the project's `--accent`.
+- Accent tints, primary-button hover, copy-button hover and pressed states, and their foregrounds and copy focus outline now read tokens. Setting `--accent` updates all accent colors; the default cyan palette retains the reference site's appearance.
+- `GUIDELINES.md`: allow one brand accent per project and subdued background motion in that accent, with outcome colors defined by their role and accompanied by a label or icon.
+
 ## 1.5.0
 
 - `scripts/vendor.py`: vendors a release into a site that can't install it with npm, such as a Zensical docs site, and `--check` fails when the copy differs. It uses only Python's standard library, so a site runs it from the tag it vendors with `uv run <url>`. It replaces Protostar's own `scripts/sync_house_style.py`.

@@ -1,6 +1,6 @@
 {
   "name": "house-style",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Shared tokens, fonts, components, and scripts for jacksonferguson.me and its project sites",
   "license": "MIT",
   "author": "Jackson Ferguson",
@@ -16,7 +16,8 @@
     "format:check": "prettier --check \"**/*.{js,ts,css,json,md,yaml,yml}\"",
     "lint": "npm run lint:eslint && npm run lint:stylelint",
     "lint:eslint": "eslint .",
-    "lint:stylelint": "stylelint \"css/**/*.css\""
+    "lint:stylelint": "stylelint \"css/**/*.css\"",
+    "test:browser": "playwright test"
   },
   "exports": {
     "./css/*": "./css/*",
@@ -37,6 +38,7 @@
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.63.0",
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
     "prettier": "^3.9.9",

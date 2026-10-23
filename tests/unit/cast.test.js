@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mountCast } from '../js/cast.js';
+import { mountCast } from '../../js/cast.js';
 
 globalThis.window = { matchMedia: () => ({ matches: false }) };
 

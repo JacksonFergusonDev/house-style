@@ -1,4 +1,4 @@
-"""Tests for scripts/vendor.py. Run with `python3 -m unittest discover tests`."""
+"""Tests for scripts/vendor.py. Run with `python3 -m unittest discover -s tests/unit`."""
 
 import contextlib
 import io
@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
 import vendor
 

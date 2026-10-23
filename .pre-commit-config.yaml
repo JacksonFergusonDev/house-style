@@ -17,7 +17,7 @@ repos:
       - id: check-yaml
       - id: check-json
 
-  # Formatting, linting, and JavaScript tests
+  # Shared local and CI checks. CI runs this stage with --all-files.
   - repo: local
     hooks:
       - id: prettier
@@ -46,20 +46,34 @@ repos:
         entry: npm test
         language: system
         pass_filenames: false
-        files: ^(js/.*\.[jt]s|tests/.*\.js|package(-lock)?\.json)$
+        files: ^(js/.*\.[jt]s|tests/unit/.*\.test\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
 
       - id: python-tests
         name: Python tests
-        entry: python3 -m unittest discover tests
+        entry: npm run test:python
         language: system
         pass_filenames: false
-        files: ^(scripts|tests)/.*\.py$
+        files: ^(scripts/.*\.py|tests/unit/.*\.py|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+
+      - id: browser-tests
+        name: Browser tests (Chromium, Firefox, WebKit)
+        entry: npm run test:browser
+        language: system
+        pass_filenames: false
+        files: ^(css/.*\.css|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+
+  # Validate workflows with the same check locally and in CI.
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
 
   # Check for accidental commits of secrets
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
       - id: gitleaks
+        entry: gitleaks dir --redact --verbose
 
   # Commit message validation
   - repo: https://github.com/Goldziher/gitfluff

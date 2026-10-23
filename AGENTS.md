@@ -22,5 +22,6 @@ No site picks up a change here until it moves to the new tag. After tagging, ope
 | --- | --- | --- | --- |
 | jacksonferguson.me | `JacksonFergusonDev/JacksonFergusonDev.github.io` | `"house-style": "github:JacksonFergusonDev/house-style#vX.Y.Z"` in `package.json` | `npm install --save github:JacksonFergusonDev/house-style#vX.Y.Z`, then check its computed styles are unchanged unless the change meant to restyle it |
 | protostar.jacksonferguson.me | `JacksonFergusonDev/protostar` | `house_style` in the `justfile`, vendored into `docs/house/` by this repository's `scripts/vendor.py` | Change the tag, run `just sync-house-style`, and commit `docs/house/`; CI fails until the copy matches the tag |
+| Star Ground (Streamlit app; React frontend and Zensical docs planned) | `JacksonFergusonDev/star-ground` | `house_style` in the `justfile`, vendored into `house/` by `scripts/vendor.py` | Change the tag, run `just sync-house-style`, and commit `house/`; CI checks the copy. The native Streamlit palette maps to the product theme; future builds consume the shared CSS and `branding/theme.css`. |
 
 A new site that adopts house-style adds a row here, and its own `AGENTS.md` says how it pins the tag and that shared styles change here, not in the site.

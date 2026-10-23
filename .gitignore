@@ -4,3 +4,5 @@ test-results/
 playwright-report/
 __pycache__/
 .rumdl_cache/
+.ruff_cache/
+.mypy_cache/

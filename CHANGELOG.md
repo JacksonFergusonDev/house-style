@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add pinned Ruff linting and formatting and strict mypy checks for the vendoring script and its tests, configured in `pyproject.toml` and run through the shared local and CI hooks.
+- Move the existing Markdown lint settings from `rumdl.toml` into `pyproject.toml`, preserving the rules and checking all Markdown files when the shared configuration changes.
+- Validate TOML files, symlinks, and executable shebangs in the shared hooks.
+
 ## 1.6.4
 
 - Derive the CI Playwright container from `package-lock.json`, resolving its digest automatically so dependency updates need no separate image pin change.

@@ -3,9 +3,7 @@
 useDefault = true
 
 [[allowlists]]
-description = "Git internals, installed dependencies, and generated local output"
+description = "Generated local output (Git internals and node_modules use default exclusions)"
 paths = [
-    '''(^|/)\.git(/|$)''',
-    '''(^|/)node_modules(/|$)''',
-    '''(^|/)(test-results|playwright-report|__pycache__|\.rumdl_cache)(/|$)''',
+    '''(^|/)(test-results|playwright-report|__pycache__|\.rumdl_cache|\.ruff_cache|\.mypy_cache)(/|$)''',
 ]

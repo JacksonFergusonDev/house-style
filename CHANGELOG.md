@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- `AGENTS.md`: register Star Ground's pinned `house/` copy, native Streamlit palette mapping, and planned React and Zensical consumers.
+
 ## 1.6.0
 
 - `css/product.css`: an optional shared navy palette for product sites and apps. Load it after `tokens.css`, then set the project's `--accent`.

@@ -51,6 +51,8 @@ jobs:
 
       - name: Run the shared pre-commit checks
         run: |
+          # Firefox requires its home directory to belong to the current user.
+          chown "$(id -u):$(id -g)" "$HOME"
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           prek run --all-files --show-diff-on-failure
 

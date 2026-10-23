@@ -94,11 +94,29 @@ Frameworks with native theme settings, such as Streamlit, should map these palet
 
 ## Development checks
 
-Run `npm ci` to install the development tools, then `prek install` to install the pre-commit and commit-message hooks. Run `prek run --all-files` to check the whole repository. Pre-commit formats text with Prettier, lints JavaScript and declarations with ESLint, lints CSS with Stylelint, and runs the JavaScript and Python tests.
+Use Node.js 24 or newer and Python 3.12 or newer. Run `npm ci` to install the development tools, then `python3 -m pip install prek==0.5.7` (or `uv tool install prek==0.5.7`) and `prek install` to install the pre-commit and commit-message hooks. Install the browser binaries once:
 
-Run `npm run lint`, `npm run format:check`, `npm test`, or `npm run test:python` to run the corresponding checks directly. `scripts/vendor.py` uses only Python's standard library. Run `npx playwright install chromium firefox webkit` once, then `npm run test:browser` to check default colors, custom accents, the navy palette, and interaction states at phone, tablet, and desktop widths in all three browser engines.
+```sh
+npx playwright install chromium firefox webkit
+```
 
-These tools are development dependencies; the shared files still have no build step.
+Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
+
+Unit tests live in `tests/unit/`; browser tests live in `tests/browser/`. Each runner explicitly targets its own suite:
+
+| Command | Check |
+| --- | --- |
+| `npm test` | JavaScript unit tests. |
+| `npm run test:python` | Python unit tests for the vendoring script. |
+| `npm run test:browser` | Browser colors and interaction states at phone, tablet, and desktop widths in Chromium, Firefox, and WebKit. |
+| `npm run lint` | JavaScript, declarations, and CSS linting. |
+| `npm run format:check` | Prettier formatting without writing files. |
+
+On macOS, the Playwright configuration gives Firefox a temporary preferences directory to avoid an [upstream profile-access issue](https://github.com/microsoft/playwright/issues/42768). It lives under the operating system's temporary directory and is separate from the installed browser's preferences.
+
+Browser hooks require the installed binaries and do not download them on every commit. CI installs its matching binaries and system dependencies, caches the hook environments, and uploads Playwright traces on failure. Secret scanning reads the working tree in both environments, excluding Git internals, installed dependencies, and generated local output through `.gitleaks.toml`.
+
+These tools are development dependencies; the shared files still have no build step, and `scripts/vendor.py` uses only Python's standard library.
 
 ## Changing it
 

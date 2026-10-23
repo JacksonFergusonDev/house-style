@@ -1,0 +1,11 @@
+# Scan working-tree files in both pre-commit and CI.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Git internals, installed dependencies, and generated local output"
+paths = [
+    '''(^|/)\.git(/|$)''',
+    '''(^|/)node_modules(/|$)''',
+    '''(^|/)(test-results|playwright-report|__pycache__|\.rumdl_cache)(/|$)''',
+]

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.3
+
+- Add GitHub Actions CI that runs the same pre-commit checks as local development, including all three browser engines, workflow linting, and working-tree secret scanning.
+- Group unit tests in `tests/unit/` and browser tests in `tests/browser/`, with explicit runner discovery and updated import paths.
+- Isolate Firefox preferences on macOS so local browser checks avoid the installed browser's protected app-data directory.
+
 ## 1.6.2
 
 - `AGENTS.md`: update consuming repositories only when explicitly requested or when a release fixes an issue affecting that site. Publishing a release no longer requires adoption pull requests for every repository.

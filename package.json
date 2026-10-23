@@ -1,6 +1,6 @@
 {
   "name": "house-style",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "Shared tokens, fonts, components, and scripts for jacksonferguson.me and its project sites",
   "license": "MIT",
   "author": "Jackson Ferguson",
@@ -10,8 +10,8 @@
   },
   "type": "module",
   "scripts": {
-    "test": "node --test",
-    "test:python": "python3 -m unittest discover tests",
+    "test": "node --test tests/unit/*.test.js",
+    "test:python": "python3 -m unittest discover -s tests/unit",
     "format": "prettier --write \"**/*.{js,ts,css,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{js,ts,css,json,md,yaml,yml}\"",
     "lint": "npm run lint:eslint && npm run lint:stylelint",

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 
 const css = await Promise.all(
   ['tokens', 'components', 'install', 'terminal', 'product'].map((name) =>
-    readFile(new URL(`../css/${name}.css`, import.meta.url), 'utf8'),
+    readFile(new URL(`../../css/${name}.css`, import.meta.url), 'utf8'),
   ),
 );
 const house = css.slice(0, 4).join('\n');
@@ -16,6 +16,7 @@ async function render(page, overrides = '') {
       * { transition: none !important; }
       body { background: var(--bg); color: var(--text); }
     </style>
+    <input aria-label="Keyboard focus helper">
     <div class="hs-section-marker"><span>01 / PRODUCT</span></div>
     <button class="hs-button hs-button--primary">Get started</button>
     <div class="hs-install-toggle">
@@ -50,6 +51,25 @@ async function color(page, selector, property, pseudo = null) {
   );
 }
 
+async function focusWithKeyboard(page, selector) {
+  await page.getByRole('textbox', { name: 'Keyboard focus helper' }).focus();
+  // macOS WebKit uses Option-Tab to include buttons in keyboard navigation.
+  const key =
+    process.platform === 'darwin' && page.context().browser().browserType().name() === 'webkit'
+      ? 'Alt+Tab'
+      : 'Tab';
+  for (let step = 0; step < 4; step += 1) {
+    await page.keyboard.press(key);
+    if (await page.locator(selector).evaluate((element) => element === document.activeElement)) {
+      break;
+    }
+  }
+  await expect(page.locator(selector)).toBeFocused();
+  expect(
+    await page.locator(selector).evaluate((element) => element.matches(':focus-visible')),
+  ).toBe(true);
+}
+
 const marker = '.hs-section-marker > span';
 const button = '.hs-button--primary';
 const copy = '.hs-install-copy';
@@ -79,9 +99,7 @@ for (const width of [390, 800, 1440]) {
       expect(await color(page, copy, 'background-color')).toEqual([0, 180, 216, 255]);
       await page.mouse.up();
       // Keyboard focus, rather than mouse focus, exercises :focus-visible.
-      await page.keyboard.press('Tab');
-      await page.locator(copy).focus();
-      await expect(page.locator(copy)).toBeFocused();
+      await focusWithKeyboard(page, copy);
       expect(await color(page, copy, 'outline-color')).toEqual([255, 255, 255, 255]);
       expect(await color(page, '.hs-install code', 'color', '::before')).toEqual([
         74, 222, 128, 255,
@@ -104,8 +122,7 @@ for (const width of [390, 800, 1440]) {
           expect(a).toBeGreaterThan(0);
         }
         expect(await color(page, '.hs-install-tab', 'color')).toEqual([74, 222, 128, 255]);
-        await page.keyboard.press('Tab');
-        await page.locator('.hs-install-tab').focus();
+        await focusWithKeyboard(page, '.hs-install-tab');
         expect(await color(page, '.hs-install-tab', 'outline-color')).toEqual([74, 222, 128, 255]);
         await page.locator(button).hover();
         const primaryHover = await color(page, button, 'background-color');
@@ -157,8 +174,7 @@ for (const width of [390, 800, 1440]) {
       await page.mouse.down();
       expect(await color(page, copy, 'background-color')).toEqual([30, 58, 138, 255]);
       await page.mouse.up();
-      await page.keyboard.press('Tab');
-      await page.locator(copy).focus();
+      await focusWithKeyboard(page, copy);
       expect(await color(page, copy, 'outline-color')).toEqual([253, 224, 71, 255]);
     });
   });

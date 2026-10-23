@@ -14,9 +14,11 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 - **`scripts/vendor.py` serves every site that vendors a release.** Keep it to Python's standard library so `uv run` can fetch it by URL in any repository. A site runs it from the tag it vendors, so a change to it ships in a release like any other file.
 - **Never hard-wrap Markdown prose.**
 
-## Releasing a change to the sites
+## Adopting a release in a site
 
-No site picks up a change here until it moves to the new tag. After tagging, open one pull request per site:
+Each site pins its own release and adopts changes independently. Publishing a new house-style release does not trigger updates in consuming repositories. Open an adoption pull request only when explicitly requested or when the release fixes an issue affecting that site. Update only the requested or affected sites; leave other sites on their current pins.
+
+Use the table below when an update is needed:
 
 | Site | Repository | How it pins house-style | To move it to a new tag |
 | --- | --- | --- | --- |

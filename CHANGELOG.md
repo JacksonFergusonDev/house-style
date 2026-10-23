@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.2
+
+- `AGENTS.md`: update consuming repositories only when explicitly requested or when a release fixes an issue affecting that site. Publishing a release no longer requires adoption pull requests for every repository.
+
 ## 1.6.1
 
 - `AGENTS.md`: register Star Ground's pinned `house/` copy, native Streamlit palette mapping, and planned React and Zensical consumers.

@@ -3,6 +3,7 @@
 ## 1.6.3
 
 - Add GitHub Actions CI that runs the same pre-commit checks as local development, including all three browser engines, workflow linting, and working-tree secret scanning.
+- Use a version-pinned Playwright container in CI to avoid installing browsers and Linux dependencies on every run.
 - Group unit tests in `tests/unit/` and browser tests in `tests/browser/`, with explicit runner discovery and updated import paths.
 - Isolate Firefox preferences on macOS so local browser checks avoid the installed browser's protected app-data directory.
 

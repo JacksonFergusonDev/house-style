@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.4
+
+- Derive the CI Playwright container from `package-lock.json`, resolving its digest automatically so dependency updates need no separate image pin change.
+
 ## 1.6.3
 
 - Add GitHub Actions CI that runs the same pre-commit checks as local development, including all three browser engines, workflow linting, and working-tree secret scanning.

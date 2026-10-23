@@ -114,7 +114,7 @@ Unit tests live in `tests/unit/`; browser tests live in `tests/browser/`. Each r
 
 On macOS, the Playwright configuration gives Firefox a temporary preferences directory to avoid an [upstream profile-access issue](https://github.com/microsoft/playwright/issues/42768). It lives under the operating system's temporary directory and is separate from the installed browser's preferences.
 
-Browser hooks require the installed binaries and do not download them on every commit. CI uses the official Playwright container with browsers and system dependencies already installed, caches the hook environments, and uploads Playwright traces on failure. Keep the container version aligned with `@playwright/test` when updating it. Secret scanning reads the working tree in both environments, excluding Git internals, installed dependencies, and generated local output through `.gitleaks.toml`.
+Browser hooks require the installed binaries and do not download them on every commit. CI uses the official Playwright container with browsers and system dependencies already installed, caches the hook environments, and uploads Playwright traces on failure. A setup job reads the Playwright version from `package-lock.json`, resolves the matching official image digest, and passes that image to the checks job. Updating the npm lockfile also updates the selected image; there is no separate image version pin to maintain. Secret scanning reads the working tree in both environments, excluding Git internals, installed dependencies, and generated local output through `.gitleaks.toml`.
 
 These tools are development dependencies; the shared files still have no build step, and `scripts/vendor.py` uses only Python's standard library.
 

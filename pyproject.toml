@@ -1,3 +1,29 @@
+# Development checks only; vendor.py remains a standalone standard-library script.
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+src = ["scripts"]
+
+[tool.ruff.lint]
+# Basic errors, unused code, import sorting, modern syntax, and common bugs.
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# The standalone script must be on sys.path before the test imports it.
+"tests/unit/test_vendor.py" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["scripts", "tests/unit"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/scripts"
+strict = true
+warn_unreachable = true
+
+[tool.rumdl]
 # --- Globally disabled rules ---
 disable = [
     "MD013", # line length – creates unnecessary diff churn
@@ -8,26 +34,26 @@ disable = [
 
 # --- Heading style ---
 # Enforce ATX style (# Heading) exclusively; setext (underlined) headings are not allowed
-[MD003]
+[tool.rumdl.MD003]
 style = "atx"
 
 # --- Unordered list style ---
 # Use dash (-) for list markers – cleaner than * or +, and reduces git diff noise
-[MD004]
+[tool.rumdl.MD004]
 style = "dash"
 
 # --- Trailing spaces ---
 # Allow exactly 2 spaces for hard line breaks (Markdown standard); flag any other stray whitespace
-[MD009]
+[tool.rumdl.MD009]
 br-spaces = 2
 strict = false
 
 # --- Duplicate headings ---
 # Allow identical subheadings (e.g., "Parameters") as long as they appear under different parent headings
-[MD024]
+[tool.rumdl.MD024]
 siblings-only = true
 
 # --- Ordered list numbering ---
 # Use "one" style (1., 1., 1.) so reordering list items doesn't create massive diff churn
-[MD029]
+[tool.rumdl.MD029]
 style = "one"

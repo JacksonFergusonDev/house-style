@@ -100,7 +100,7 @@ Use Node.js 24 or newer and Python 3.12 or newer. Run `npm ci` to install the de
 npx playwright install chromium firefox webkit
 ```
 
-Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
+Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, Ruff linting and formatting, strict mypy type checking, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
 
 Unit tests live in `tests/unit/`; browser tests live in `tests/browser/`. Each runner explicitly targets its own suite:
 
@@ -116,7 +116,11 @@ On macOS, the Playwright configuration gives Firefox a temporary preferences dir
 
 Browser hooks require the installed binaries and do not download them on every commit. CI uses the official Playwright container with browsers and system dependencies already installed, caches the hook environments, and uploads Playwright traces on failure. A setup job reads the Playwright version from `package-lock.json`, resolves the matching official image digest, and passes that image to the checks job. Updating the npm lockfile also updates the selected image; there is no separate image version pin to maintain. Secret scanning reads the working tree in both environments, excluding Git internals, installed dependencies, and generated local output through `.gitleaks.toml`.
 
+Python checks are configured in `pyproject.toml` for Python 3.12. Ruff checks basic errors, unused code, import ordering, modern syntax, and common bugs, and formats Python at 88 columns with double quotes. Mypy checks the script and its tests in strict mode, including unreachable code. Run `prek run ruff-check --all-files`, `prek run ruff-format --all-files`, or `prek run mypy --all-files` individually. Each hook checks the whole Python suite when Python files or its configuration change. Prek installs the pinned tools in isolated environments; no Python project installation is needed.
+
 These tools are development dependencies; the shared files still have no build step, and `scripts/vendor.py` uses only Python's standard library.
+
+Rumdl's Markdown rules also live in `pyproject.toml`, under `[tool.rumdl]`. Its lint and format hooks check all Markdown files when Markdown or the shared configuration changes. Gitleaks keeps `.gitleaks.toml` because it expects settings at the TOML root and does not support a `pyproject.toml` tool section. Prettier, Stylelint, ESLint, Playwright, and prek also retain their native configuration files.
 
 ## Changing it
 

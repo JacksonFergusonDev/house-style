@@ -2,12 +2,19 @@ import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
 const css = await Promise.all(
-  ['tokens', 'components', 'install', 'terminal', 'product'].map((name) =>
+  ['tokens', 'components', 'install', 'terminal'].map((name) =>
     readFile(new URL(`../../css/${name}.css`, import.meta.url), 'utf8'),
   ),
 );
-const house = css.slice(0, 4).join('\n');
-const product = css[4];
+const house = css.join('\n');
+// A product's navy surfaces, set the way a site sets them: by redefining tokens.
+const navy = `:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --text: #ffffff;
+  --muted: #94a3b8;
+  --line: #334155;
+}`;
 
 async function render(page, overrides = '') {
   await page.setContent(`
@@ -106,13 +113,13 @@ for (const width of [390, 800, 1440]) {
       ]);
     });
 
-    for (const useProduct of [false, true]) {
-      test(`one green accent updates every state ${useProduct ? 'with navy surfaces' : 'with default surfaces'}`, async ({
+    for (const useNavy of [false, true]) {
+      test(`one green accent updates every state ${useNavy ? 'with navy surfaces' : 'with default surfaces'}`, async ({
         page,
       }) => {
-        await render(page, `${useProduct ? product : ''}\n:root { --accent: #4ade80; }`);
+        await render(page, `${useNavy ? navy : ''}\n:root { --accent: #4ade80; }`);
         expect(await color(page, 'body', 'background-color')).toEqual(
-          useProduct ? [15, 23, 42, 255] : [10, 12, 14, 255],
+          useNavy ? [15, 23, 42, 255] : [10, 12, 14, 255],
         );
         expect(await color(page, marker, 'color')).toEqual([74, 222, 128, 255]);
         for (const property of ['background-color', 'border-top-color']) {
@@ -146,7 +153,7 @@ for (const width of [390, 800, 1440]) {
     }) => {
       await render(
         page,
-        `${product}\n:root {
+        `${navy}\n:root {
         --accent: #1d4ed8;
         --button-fg: white;
         --accent-hover: #1e40af;

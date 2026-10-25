@@ -1,0 +1,28 @@
+---
+/**
+ * The hero's jump links (css/site.css, `.hs-jumps`): one per top-level
+ * section, numbered like its section marker, pointing down the page.
+ */
+import Icon from './Icon.astro';
+
+export interface Jump {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  jumps: Jump[];
+}
+const { jumps } = Astro.props;
+---
+
+<nav class="hs-jumps" aria-label="On this page">
+  {
+    jumps.map((jump, i) => (
+      <a href={jump.href}>
+        {String(i + 1).padStart(2, '0')} / {jump.label.toUpperCase()}
+        <Icon name="arrow-down" />
+      </a>
+    ))
+  }
+</nav>

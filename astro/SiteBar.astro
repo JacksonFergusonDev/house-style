@@ -1,0 +1,56 @@
+---
+/**
+ * A project site's header bar (css/site.css, `.hs-bar`): the project's mark,
+ * its primary links, then any buttons in the `end` slot, its GitHub link, and
+ * the link home to jacksonferguson.me.
+ */
+import Icon from './Icon.astro';
+
+export interface BarLink {
+  label: string;
+  href: string;
+  /** Hidden on narrow screens, where the bar has no room for it. */
+  wide?: boolean;
+}
+
+interface Props {
+  name: string;
+  logo: string;
+  home?: string;
+  nav?: BarLink[];
+  github?: string;
+}
+const { name, logo, home = '/', nav = [], github } = Astro.props;
+---
+
+<header class="hs-bar">
+  <div class="hs-bar-inner">
+    <a class="hs-bar-mark" href={home}><img src={logo} alt="" width="30" height="30" />{name}</a>
+    {
+      nav.length > 0 && (
+        <nav class="hs-bar-nav" aria-label="Primary">
+          {nav.map((link) => (
+            <a class:list={{ 'hs-wide': link.wide }} href={link.href}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      )
+    }
+    <div class="hs-bar-end">
+      <slot name="end" />
+      {
+        github && (
+          <a class="hs-bar-link" href={github}>
+            <Icon name="brand-github" />
+            GitHub
+          </a>
+        )
+      }
+      <a class="hs-bar-link hs-wide" href="https://jacksonferguson.me/">
+        <Icon name="jacksonferguson" />
+        jacksonferguson.me
+      </a>
+    </div>
+  </div>
+</header>

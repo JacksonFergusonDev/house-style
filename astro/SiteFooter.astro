@@ -1,0 +1,53 @@
+---
+/**
+ * A project site's footer (css/site.css, `.hs-footer`): copyright and licence,
+ * then icon links. Anything in the default slot sits above them as a note.
+ */
+import Icon, { type IconName } from './Icon.astro';
+
+export interface FooterLink {
+  label: string;
+  href: string;
+  icon: IconName;
+}
+
+interface Props {
+  license?: string;
+  links?: FooterLink[];
+}
+const { license, links = [] } = Astro.props;
+const year = new Date().getUTCFullYear();
+---
+
+<footer class="hs-footer">
+  {
+    Astro.slots.has('default') && (
+      <div class="hs-footer-note">
+        <slot />
+      </div>
+    )
+  }
+  <div class="hs-footer-inner">
+    <p>
+      © {year} Jackson Ferguson.{
+        license && (
+          <>
+            {' '}
+            <a href={license}>License</a>
+          </>
+        )
+      }
+    </p>
+    {
+      links.length > 0 && (
+        <nav class="hs-footer-links" aria-label="Social links">
+          {links.map((link) => (
+            <a href={link.href} aria-label={link.label} title={link.label}>
+              <Icon name={link.icon} />
+            </a>
+          ))}
+        </nav>
+      )
+    }
+  </div>
+</footer>

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0
+
+- **Parts.** `parts.json` splits the release into `core` (fonts, tokens, components, icons, guidelines), `docs` (terminal, install box, recordings, extended fonts), `site`, and `astro`. `scripts/vendor.py` now requires `--parts` and copies only those parts plus core, so a documentation site no longer commits files it never loads. Node sites still install the whole release, which stays in `node_modules`.
+- **The project-site shell**, lifted from Protostar's landing page, which followed jacksonferguson.me: `css/site.css` adds `.hs-bar` (header bar), `.hs-hero` with `.hs-field` and the `.hs-motion` pause button, `.hs-jumps`, `.hs-grid`, and `.hs-footer`. `js/field.js` exports `startField(three, canvas, button)`: the hero's moving Dadras attractor, taking three.js as an argument and its colour, strength, and blending from the canvas's `--hs-field-*` properties, so it follows each site's accent and light scheme.
+- **Astro components** in `astro/`: `SiteBar`, `HeroField`, `JumpLinks`, `SiteFooter`, `SectionMarker`, and `Icon`. `three` is an optional peer dependency, for `HeroField`.
+- `css/tokens.css`: `--subtle` (`#a1abb3`, quiet labels over moving backgrounds) and `--grid` (`#14202570`, the section grid's lines).
+- **Breaking:** `css/product.css` is removed; every site uses the near-black palette with its own accent. The Nerd Font symbols `@font-face` moves from `fonts.css` to `terminal.css`, the only stylesheet that uses it. `vendor.py` requires `--parts`.
+
 ## 1.6.4
 
 - Derive the CI Playwright container from `package-lock.json`, resolving its digest automatically so dependency updates need no separate image pin change.

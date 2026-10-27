@@ -1,6 +1,6 @@
 {
   "name": "house-style",
-  "version": "1.6.4",
+  "version": "3.0.0",
   "description": "Shared tokens, fonts, components, and scripts for jacksonferguson.me and its project sites",
   "license": "MIT",
   "author": "Jackson Ferguson",
@@ -24,13 +24,17 @@
     "./js/*": "./js/*",
     "./fonts/*": "./fonts/*",
     "./icons/*": "./icons/*",
-    "./GUIDELINES.md": "./GUIDELINES.md"
+    "./GUIDELINES.md": "./GUIDELINES.md",
+    "./astro/*": "./astro/*",
+    "./parts.json": "./parts.json"
   },
   "files": [
     "css",
     "js",
     "fonts",
     "icons",
+    "astro",
+    "parts.json",
     "GUIDELINES.md"
   ],
   "sideEffects": [

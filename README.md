@@ -6,71 +6,102 @@ Sites never load these files from here at runtime. Each one copies a tagged rele
 
 ## What's here
 
-| File | What it gives a page |
-| --- | --- |
-| `css/tokens.css` | The palette (`--bg`, `--panel`, `--text`, `--muted`, `--accent`, `--line`), the typefaces (`--sans`, `--mono`), the type scale (`--fs-*`), and the code surfaces (`--code-*`, `--prompt`). |
-| `css/product.css` | Optional navy backgrounds, panels, borders, and text for product sites and apps. |
-| `css/fonts.css` | Self-hosted DM Sans (400 to 700), JetBrains Mono (400), and the Nerd Font symbols terminal recordings use. |
-| `css/fonts-extended.css` | Italic DM Sans and bold JetBrains Mono, for documentation with emphasis and highlighted code. |
-| `css/components.css` | `.hs-section-marker` and `.hs-button` (with `.hs-button--primary`). |
-| `css/terminal.css` | `.hs-terminal`, the window recordings and screenshots sit in, and the asciinema-player skin. |
-| `css/install.css` | `.hs-install`, an install command with a package-manager toggle and a copy button. |
-| `css/icons.css` | `.hs-icon hs-icon-<name>`: the icons in `icons/`, drawn in the text's color for pages that can't inline SVG. |
-| `icons/*.svg` | The house icons: arrows and other line icons, brand marks, and the jacksonferguson.me mark. |
-| `js/copy-command.js` | `initCopyCommands(root)`: wires the install box's tabs and copy buttons. |
-| `js/cast.js` | `castOptions()`, `mountCast(create, element)`, `loadSymbolsFont()`, `whenVisible(element, callback)`: plays a recording in a terminal window. |
+house-style comes in parts, so a site takes only what it uses. `parts.json` lists each part's files.
+
+| Part | File | What it gives a page |
+| --- | --- | --- |
+| **core**, every site | `css/tokens.css` | The palette (`--bg`, `--panel`, `--text`, `--muted`, `--subtle`, `--accent`, `--line`, `--grid`), the typefaces (`--sans`, `--mono`), the type scale (`--fs-*`), and the code surfaces (`--code-*`, `--prompt`). |
+|  | `css/fonts.css` | Self-hosted DM Sans (400 to 700) and JetBrains Mono (400). |
+|  | `css/components.css` | `.hs-section-marker` and `.hs-button` (with `.hs-button--primary`). |
+|  | `css/icons.css` | `.hs-icon hs-icon-<name>`: the icons in `icons/`, drawn in the text's color for pages that can't inline SVG. |
+|  | `icons/*.svg` | The house icons: arrows and other line icons, brand marks, and the jacksonferguson.me mark. |
+| **docs**, documentation | `css/fonts-extended.css` | Italic DM Sans and bold JetBrains Mono, for emphasis and highlighted code. |
+|  | `css/terminal.css` | `.hs-terminal`, the window recordings and screenshots sit in, the asciinema-player skin, and the Nerd Font symbols recordings draw with. |
+|  | `css/install.css` | `.hs-install`, an install command with a package-manager toggle and a copy button. |
+|  | `js/copy-command.js` | `initCopyCommands(root)`: wires the install box's tabs and copy buttons. |
+|  | `js/cast.js` | `castOptions()`, `mountCast(create, element)`, `loadSymbolsFont()`, `whenVisible(element, callback)`: plays a recording in a terminal window. |
+| **site**, a project site's shell | `css/site.css` | `.hs-bar` (the header bar), `.hs-hero` with `.hs-field` and its `.hs-motion` pause button, `.hs-jumps` (jump links), `.hs-grid` (the 80px section grid), and `.hs-footer`. |
+|  | `js/field.js` | `runField(canvas, button, scene)`, `afterLoad(start)`, `resolveColor(value)`: runs the hero's moving background, which each site draws itself, under the motion rules. |
+| **astro**, Astro sites | `astro/*.astro` | `SiteBar`, `JumpLinks`, `SiteFooter`, `SectionMarker`, and `Icon`, rendering the markup the CSS above expects. |
 
 [GUIDELINES.md](GUIDELINES.md) holds the design and writing rules every site follows, such as which arrow a link takes and who each page is written for; each site's `AGENTS.md` points at the copy it uses. Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
 
-Load the CSS in this order, before a site's own styles: `fonts.css`, `tokens.css`, the optional `product.css`, then any components. The files are plain CSS and ES modules with no build step.
+Load the CSS in this order, before a site's own styles: `fonts.css`, `tokens.css`, `components.css`, then any other part's stylesheets. The files are plain CSS and ES modules with no build step; the Astro components are source the site's own build compiles.
 
 ## Using it
 
 ### A Node site (Astro, Vite)
 
-Depend on a tag:
+Depend on a tag. npm installs the whole release into `node_modules`, which isn't committed, and the bundler includes only the files a page imports:
 
 ```json
 "dependencies": {
-  "house-style": "github:JacksonFergusonDev/house-style#v1.6.0"
+  "house-style": "github:JacksonFergusonDev/house-style#v3.0.0"
 }
 ```
 
 ```js
 import 'house-style/css/fonts.css';
 import 'house-style/css/tokens.css';
-import 'house-style/css/terminal.css';
-import { initCopyCommands } from 'house-style/js/copy-command.js';
+import 'house-style/css/components.css';
+import 'house-style/css/site.css';
 ```
 
-The bundler copies the fonts and fingerprints them like any other asset.
+An Astro site renders the shell with the components:
+
+```astro
+---
+import SiteBar from 'house-style/astro/SiteBar.astro';
+---
+
+<SiteBar name="Project" logo="/favicon.svg" github="https://github.com/…" nav={[{ label: 'Docs', href: '/docs/' }]} />
+<section class="hs-hero">…</section>
+```
+
+The bundler copies the fonts and icons and fingerprints them like any other asset.
+
+### The hero's moving background
+
+Each site draws its own field, so it can show something of its own. The site renders the canvas and pause button from `css/site.css`'s header, draws on the canvas with WebGL or a 2D context, and hands that drawing to `runField`. `runField` decides when to draw: it starts paused for readers who asked for reduced motion, stops off screen and in a hidden tab, drives the pause button, and passes in the canvas's `--hs-field-*` colour, strength, and blending. `afterLoad` starts it once the page is up, so the first screen paints as text:
+
+```js
+import { afterLoad, runField } from 'house-style/js/field.js';
+
+afterLoad(() => {
+  const gl = canvas.getContext('webgl2');
+  if (!gl) return; // The hero keeps its plain background.
+  runField(canvas, button, {
+    style({ color, strength, blend }) {
+      /* set uniforms; color is 0 to 255 */
+    },
+    resize(width, height) {
+      /* size the drawing buffer */
+    },
+    draw(time, delta) {
+      /* draw a frame; delta is 0 for a still redraw */
+    },
+    dispose() {
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+    },
+  });
+});
+```
+
+Call the returned `refresh()` after the page's colour scheme changes.
 
 ### A documentation site without Node (Zensical, MkDocs)
 
-Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
+Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. Name the parts the site uses; core always comes along. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
 
 ```sh
-uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v1.6.0/scripts/vendor.py --tag v1.6.0 docs/house
+uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.0/scripts/vendor.py --tag v3.0.0 --parts docs,site docs/house
 ```
 
-It writes the tag's CSS, scripts, fonts, icons, and guidelines into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
+It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
 
-## Product themes and brand accents
+## Brand accents
 
-The default palette preserves jacksonferguson.me and Protostar's cyan appearance. Product sites and apps can opt into the shared navy palette by loading `css/product.css` after `css/tokens.css`. It sets the background to `#0f172a`, panels to `#1e293b`, text to white, muted text to `#94a3b8`, and borders to `#334155`. Code, terminal, and install surfaces stay dark in either palette.
-
-For example, a Star Ground site would load:
-
-```js
-import 'house-style/css/fonts.css';
-import 'house-style/css/tokens.css';
-import 'house-style/css/product.css';
-import 'house-style/css/components.css';
-import 'house-style/css/install.css';
-import './brand.css';
-```
-
-Its own `brand.css` chooses green:
+Every site uses the same near-black palette. A project sets its own accent on `:root`, after the house styles; Star Ground's `brand.css`, for example, chooses green:
 
 ```css
 :root {
@@ -78,7 +109,7 @@ Its own `brand.css` chooses green:
 }
 ```
 
-Set the accent on `:root`, where the derived tokens are defined. Section-marker tints and borders, primary-button hover, and copy-button hover and pressed states all follow it, so the project needs no component overrides. The navy palette is optional; an accent override also works with the default surfaces. These styles use CSS relative colors, so the site needs a browser that supports them.
+Set the accent on `:root`, where the derived tokens are defined. Section-marker tints and borders, primary-button hover, copy-button hover and pressed states, and the hero's moving field all follow it, so the project needs no component overrides. These styles use CSS relative colors, so the site needs a browser that supports them.
 
 | Token | Role |
 | --- | --- |

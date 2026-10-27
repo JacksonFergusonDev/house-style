@@ -27,7 +27,7 @@
   },
   "overrides": [
     {
-      "files": ["css/components.css"],
+      "files": ["css/components.css", "css/site.css"],
       "rules": {
         "selector-class-pattern": "^hs-[a-z0-9]+(?:-[a-z0-9]+)*(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$"
       }

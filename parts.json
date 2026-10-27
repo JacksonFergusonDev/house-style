@@ -1,0 +1,44 @@
+{
+  "core": {
+    "description": "Every site: fonts, tokens, section markers and buttons, icons, and the guidelines.",
+    "files": [
+      "LICENSE",
+      "GUIDELINES.md",
+      "css/fonts.css",
+      "css/tokens.css",
+      "css/components.css",
+      "css/icons.css",
+      "fonts/README.md",
+      "fonts/OFL-DM-Sans.txt",
+      "fonts/OFL-JetBrains-Mono.txt",
+      "fonts/dm-sans-latin-400-normal.woff2",
+      "fonts/dm-sans-latin-500-normal.woff2",
+      "fonts/dm-sans-latin-600-normal.woff2",
+      "fonts/dm-sans-latin-700-normal.woff2",
+      "fonts/jetbrains-mono-latin-400-normal.woff2",
+      "icons/README.md",
+      "icons/*.svg"
+    ]
+  },
+  "docs": {
+    "description": "Documentation: the terminal window and recordings, the install box, and italic and bold faces.",
+    "files": [
+      "css/fonts-extended.css",
+      "css/terminal.css",
+      "css/install.css",
+      "js/cast.js",
+      "js/copy-command.js",
+      "fonts/dm-sans-latin-400-italic.woff2",
+      "fonts/jetbrains-mono-latin-700-normal.woff2",
+      "fonts/SymbolsNerdFontMono-Regular.woff2"
+    ]
+  },
+  "site": {
+    "description": "A project site's shell: header bar, hero with the runner for its moving field, jump links, section grid, and footer.",
+    "files": ["css/site.css", "js/field.js"]
+  },
+  "astro": {
+    "description": "Astro components over core and site, for sites that install house-style with npm.",
+    "files": ["astro/*.astro"]
+  }
+}

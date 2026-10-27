@@ -2,6 +2,7 @@
 
 import contextlib
 import io
+import json
 import sys
 import tarfile
 import tempfile
@@ -24,16 +25,37 @@ def _archive(files: dict[str, bytes], root: str = "house-style-1.0.0") -> bytes:
     return buffer.getvalue()
 
 
+PARTS = {
+    "core": {
+        "files": [
+            "LICENSE",
+            "GUIDELINES.md",
+            "css/tokens.css",
+            "fonts/README.md",
+            "fonts/OFL.txt",
+            "fonts/dm-sans.woff2",
+            "icons/README.md",
+            "icons/*.svg",
+        ]
+    },
+    "docs": {"files": ["css/terminal.css", "js/cast.js", "fonts/symbols.woff2"]},
+    "site": {"files": ["css/site.css", "js/field.js"]},
+}
+
 RELEASE = {
     "LICENSE": b"MIT",
     "README.md": b"# house-style",
     "package.json": b"{}",
+    "parts.json": json.dumps(PARTS).encode(),
     "css/tokens.css": b":root {}",
-    "css/product.css": b":root { --bg: #0f172a; }",
+    "css/terminal.css": b".hs-terminal {}",
+    "css/site.css": b".hs-bar {}",
     "css/notes.txt": b"not a stylesheet",
     "js/cast.js": b"export {};",
     "js/cast.d.ts": b"export {};",
+    "js/field.js": b"export {};",
     "fonts/dm-sans.woff2": b"font",
+    "fonts/symbols.woff2": b"symbols",
     "fonts/OFL.txt": b"license",
     "fonts/README.md": b"# Fonts",
     "icons/arrow-right.svg": b"<svg/>",
@@ -43,6 +65,18 @@ RELEASE = {
     "AGENTS.md": b"# Agents",
 }
 
+CORE_FILES = {
+    "LICENSE",
+    "README.txt",
+    "css/tokens.css",
+    "fonts/dm-sans.woff2",
+    "fonts/OFL.txt",
+    "fonts/README.txt",
+    "icons/arrow-right.svg",
+    "icons/README.txt",
+    "GUIDELINES.txt",
+}
+
 
 class VendorTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -50,35 +84,42 @@ class VendorTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
 
-    def test_release_files_keep_what_a_site_serves(self) -> None:
-        files = vendor.release_files(_archive(RELEASE), "v9.9.9")
+    def test_core_alone_is_what_every_site_serves(self) -> None:
+        files = vendor.release_files(_archive(RELEASE), "v9.9.9", {"core"})
+
+        self.assertEqual(set(files), CORE_FILES)
+        self.assertEqual(files["fonts/README.txt"], b"# Fonts")
+        self.assertEqual(files["GUIDELINES.txt"], b"# Guidelines")
+        self.assertIn(b"house-style v9.9.9 (core)", files["README.txt"])
+
+    def test_a_part_adds_its_files_to_core(self) -> None:
+        files = vendor.release_files(_archive(RELEASE), "v9.9.9", {"docs"})
 
         self.assertEqual(
             set(files),
-            {
-                "LICENSE",
-                "README.txt",
-                "css/tokens.css",
-                "css/product.css",
-                "js/cast.js",
-                "fonts/dm-sans.woff2",
-                "fonts/OFL.txt",
-                "fonts/README.txt",
-                "icons/arrow-right.svg",
-                "icons/README.txt",
-                "GUIDELINES.txt",
-            },
+            CORE_FILES | {"css/terminal.css", "js/cast.js", "fonts/symbols.woff2"},
         )
-        self.assertEqual(files["fonts/README.txt"], b"# Fonts")
-        self.assertEqual(files["GUIDELINES.txt"], b"# Guidelines")
-        self.assertIn(b"house-style v9.9.9", files["README.txt"])
+        self.assertIn(b"(core, docs)", files["README.txt"])
+
+    def test_an_unknown_part_is_refused(self) -> None:
+        archive = _archive(RELEASE)
+        err = io.StringIO()
+        with (
+            mock.patch.object(vendor, "fetch_archive", return_value=archive),
+            contextlib.redirect_stderr(err),
+            self.assertRaises(SystemExit) as raised,
+        ):
+            vendor.main([str(self.root), "--tag", "v1.0.0", "--parts", "astral"])
+
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("Unknown part astral", err.getvalue())
 
     def test_write_files_leaves_exactly_the_release(self) -> None:
         (self.root / "css").mkdir()
         (self.root / "css" / "old.css").write_text("stale")
         (self.root / "gone").mkdir()
         (self.root / "gone" / "file.js").write_text("stale")
-        files = vendor.release_files(_archive(RELEASE), "v9.9.9")
+        files = vendor.release_files(_archive(RELEASE), "v9.9.9", {"site"})
 
         vendor.write_files(self.root, files)
 
@@ -90,7 +131,9 @@ class VendorTests(unittest.TestCase):
         for edit in ("matches", "edited", "missing"):
             with self.subTest(edit=edit):
                 destination = self.root / edit
-                vendor.write_files(destination, vendor.release_files(archive, "v1.0.0"))
+                vendor.write_files(
+                    destination, vendor.release_files(archive, "v1.0.0", {"docs"})
+                )
                 if edit == "edited":
                     (destination / "css" / "tokens.css").write_text(
                         ":root { --bg: red; }"
@@ -98,7 +141,14 @@ class VendorTests(unittest.TestCase):
                 elif edit == "missing":
                     (destination / "js" / "cast.js").unlink()
                 out, err = io.StringIO(), io.StringIO()
-                argv = [str(destination), "--tag", "v1.0.0", "--check"]
+                argv = [
+                    str(destination),
+                    "--tag",
+                    "v1.0.0",
+                    "--parts",
+                    "docs",
+                    "--check",
+                ]
                 with (
                     mock.patch.object(vendor, "fetch_archive", return_value=archive),
                     contextlib.redirect_stdout(out),
@@ -120,10 +170,11 @@ class VendorTests(unittest.TestCase):
             mock.patch.object(vendor, "fetch_archive", return_value=archive),
             contextlib.redirect_stdout(io.StringIO()),
         ):
-            vendor.main([str(destination), "--tag", "v1.0.0"])
+            vendor.main([str(destination), "--tag", "v1.0.0", "--parts", "docs,site"])
 
         self.assertEqual(
-            vendor.committed_files(destination), vendor.release_files(archive, "v1.0.0")
+            vendor.committed_files(destination),
+            vendor.release_files(archive, "v1.0.0", {"docs", "site"}),
         )
 
 

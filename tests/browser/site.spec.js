@@ -96,7 +96,6 @@ test.describe('the site shell', () => {
   test('the motion button stays hidden until a field runs', async ({ page }) => {
     await render(page);
     await expect(page.locator('.hs-motion')).toBeHidden();
-    await expect(page.locator('.hs-field')).not.toHaveClass(/hs-field--ready/);
   });
 
   test('the field starts paused for reduced motion, and its button toggles it', async ({
@@ -117,7 +116,6 @@ test.describe('the site shell', () => {
     await expect(motion).toHaveAttribute('data-hs-paused', 'true');
     await expect(page.locator('.hs-motion-play')).toBeVisible();
     await expect(page.locator('.hs-motion-pause')).toBeHidden();
-    await expect(page.locator('.hs-field')).toHaveClass(/hs-field--ready/);
     // Paused, it draws one still frame and never moves.
     const still = await page.evaluate(() => window.scene.draws);
     expect(still.every(([, delta]) => delta === 0)).toBe(true);

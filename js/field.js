@@ -142,7 +142,6 @@ export function runField(canvas, button, scene) {
   button.addEventListener('click', toggle);
   reducedMotion.addEventListener('change', onMotionChange);
   document.addEventListener('visibilitychange', sync);
-  canvas.classList.add('hs-field--ready');
   sync();
 
   return {

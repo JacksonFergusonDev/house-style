@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 3.0.0
 
-- **Breaking:** each site draws its own hero field. `js/field.js` no longer draws the Dadras attractor with three.js; it exports `runField(canvas, button, scene)`, which runs a site's drawing under the motion rules (still for reduced motion, paused off screen or in a hidden tab, the pause button, the `hs-field--ready` fade-in) and hands it the canvas's `--hs-field-*` style. `afterLoad(start)` starts it after the page is up, and `resolveColor(value)` turns any CSS colour, relative colours included, into RGB channels. `startField` is removed.
+- **Breaking:** each site draws its own hero field. `js/field.js` no longer draws the Dadras attractor with three.js; it exports `runField(canvas, button, scene)`, which runs a site's drawing under the motion rules (still for reduced motion, paused off screen or in a hidden tab, the pause button) and hands it the canvas's `--hs-field-*` style. `afterLoad(start)` starts it after the page is up, and `resolveColor(value)` turns any CSS colour, relative colours included, into RGB channels. `startField` is removed.
+- **Breaking:** the field no longer fades in: `.hs-field--ready` is removed, and the canvas shows as soon as a site draws on it.
 - **Breaking:** `astro/HeroField.astro` is removed, and with it the optional `three` peer dependency.
 
 ## 2.0.0

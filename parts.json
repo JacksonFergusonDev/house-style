@@ -34,7 +34,7 @@
     ]
   },
   "site": {
-    "description": "A project site's shell: header bar, hero with its moving field, jump links, section grid, and footer.",
+    "description": "A project site's shell: header bar, hero with the runner for its moving field, jump links, section grid, and footer.",
     "files": ["css/site.css", "js/field.js"]
   },
   "astro": {

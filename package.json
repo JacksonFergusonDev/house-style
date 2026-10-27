@@ -1,6 +1,6 @@
 {
   "name": "house-style",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Shared tokens, fonts, components, and scripts for jacksonferguson.me and its project sites",
   "license": "MIT",
   "author": "Jackson Ferguson",
@@ -40,14 +40,6 @@
   "sideEffects": [
     "*.css"
   ],
-  "peerDependencies": {
-    "three": ">=0.170.0"
-  },
-  "peerDependenciesMeta": {
-    "three": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.63.0",

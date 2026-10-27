@@ -21,8 +21,8 @@ house-style comes in parts, so a site takes only what it uses. `parts.json` list
 |  | `js/copy-command.js` | `initCopyCommands(root)`: wires the install box's tabs and copy buttons. |
 |  | `js/cast.js` | `castOptions()`, `mountCast(create, element)`, `loadSymbolsFont()`, `whenVisible(element, callback)`: plays a recording in a terminal window. |
 | **site**, a project site's shell | `css/site.css` | `.hs-bar` (the header bar), `.hs-hero` with `.hs-field` and its `.hs-motion` pause button, `.hs-jumps` (jump links), `.hs-grid` (the 80px section grid), and `.hs-footer`. |
-|  | `js/field.js` | `startField(three, canvas, button)`: the hero's moving background, the Dadras attractor in the accent color. |
-| **astro**, Astro sites | `astro/*.astro` | `SiteBar`, `HeroField`, `JumpLinks`, `SiteFooter`, `SectionMarker`, and `Icon`, rendering the markup the CSS above expects. |
+|  | `js/field.js` | `runField(canvas, button, scene)`, `afterLoad(start)`, `resolveColor(value)`: runs the hero's moving background, which each site draws itself, under the motion rules. |
+| **astro**, Astro sites | `astro/*.astro` | `SiteBar`, `JumpLinks`, `SiteFooter`, `SectionMarker`, and `Icon`, rendering the markup the CSS above expects. |
 
 [GUIDELINES.md](GUIDELINES.md) holds the design and writing rules every site follows, such as which arrow a link takes and who each page is written for; each site's `AGENTS.md` points at the copy it uses. Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
 
@@ -36,7 +36,7 @@ Depend on a tag. npm installs the whole release into `node_modules`, which isn't
 
 ```json
 "dependencies": {
-  "house-style": "github:JacksonFergusonDev/house-style#v2.0.0"
+  "house-style": "github:JacksonFergusonDev/house-style#v3.0.0"
 }
 ```
 
@@ -52,24 +52,52 @@ An Astro site renders the shell with the components:
 ```astro
 ---
 import SiteBar from 'house-style/astro/SiteBar.astro';
-import HeroField from 'house-style/astro/HeroField.astro';
 ---
 
 <SiteBar name="Project" logo="/favicon.svg" github="https://github.com/…" nav={[{ label: 'Docs', href: '/docs/' }]} />
-<section class="hs-hero"><HeroField />…</section>
+<section class="hs-hero">…</section>
 ```
 
-`HeroField` loads `three` after the page is up, so a site that uses it installs `three` too. The bundler copies the fonts and icons and fingerprints them like any other asset.
+The bundler copies the fonts and icons and fingerprints them like any other asset.
+
+### The hero's moving background
+
+Each site draws its own field, so it can show something of its own. The site renders the canvas and pause button from `css/site.css`'s header, draws on the canvas with WebGL or a 2D context, and hands that drawing to `runField`. `runField` decides when to draw: it starts paused for readers who asked for reduced motion, stops off screen and in a hidden tab, drives the pause button, and passes in the canvas's `--hs-field-*` colour, strength, and blending. `afterLoad` starts it once the page is up, so the first screen paints as text:
+
+```js
+import { afterLoad, runField } from 'house-style/js/field.js';
+
+afterLoad(() => {
+  const gl = canvas.getContext('webgl2');
+  if (!gl) return; // The hero keeps its plain background.
+  runField(canvas, button, {
+    style({ color, strength, blend }) {
+      /* set uniforms; color is 0 to 255 */
+    },
+    resize(width, height) {
+      /* size the drawing buffer */
+    },
+    draw(time, delta) {
+      /* draw a frame; delta is 0 for a still redraw */
+    },
+    dispose() {
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+    },
+  });
+});
+```
+
+Call the returned `refresh()` after the page's colour scheme changes.
 
 ### A documentation site without Node (Zensical, MkDocs)
 
 Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. Name the parts the site uses; core always comes along. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
 
 ```sh
-uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v2.0.0/scripts/vendor.py --tag v2.0.0 --parts docs,site docs/house
+uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.0/scripts/vendor.py --tag v3.0.0 --parts docs,site docs/house
 ```
 
-It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules. A site without Node passes three.js to `startField` itself, for example from a CDN.
+It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
 
 ## Brand accents
 

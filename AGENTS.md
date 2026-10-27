@@ -6,7 +6,7 @@ This repository is the shared look of jacksonferguson.me and the project sites o
 
 - **[GUIDELINES.md](GUIDELINES.md) is the design and writing contract.** Follow it in every file here, and change it here when a rule needs to change. Each site's `AGENTS.md` points at the copy it vendors.
 - **jacksonferguson.me is the reference.** A rule that came from the site keeps its exact values. Before releasing a change, check that the site renders identically, unless the change is meant to restyle it. Compare the computed style of every element, `::before` and `::after` included, across its pages at several widths.
-- **Plain files, no build step.** CSS is plain CSS, and scripts are ES modules that import nothing (pass a library in instead, as `mountCast(create, element)` and `startField(three, canvas, button)` do). Each script has a matching `.d.ts`. The Astro components in `astro/` are source the consuming site compiles; they render the markup the CSS documents and add no styles of their own.
+- **Plain files, no build step.** CSS is plain CSS, and scripts are ES modules that import nothing (pass a library in instead, as `mountCast(create, element)` does). Each script has a matching `.d.ts`. The Astro components in `astro/` are source the consuming site compiles; they render the markup the CSS documents and add no styles of their own.
 - **Every shipped file belongs to one part in `parts.json`.** A stylesheet references only files in its own part or core; `tests/unit/test_parts.py` checks both.
 - **Prefix every class `hs-`** so it can't collide with a site's own styles or a documentation theme.
 - **Size in `px`, never `rem`.** Documentation themes change the root font size.

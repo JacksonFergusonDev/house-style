@@ -7,26 +7,14 @@ const css = (
 ).join('\n');
 const field = await read('js/field.js');
 
-// Enough of three.js for js/field.js to run without WebGL, recording the colour it's given.
-const fakeThree = `
-  const noop = () => {};
-  const chain = { set() { return { add: noop }; } };
-  class Vector { set() { return this; } }
-  window.fieldColors = [];
-  window.fakeThree = {
-    WebGLRenderer: class { setPixelRatio() {} setSize() {} getDrawingBufferSize() {} render() {} dispose() {} },
-    Scene: class { add() {} },
-    PerspectiveCamera: class { position = chain; setViewOffset() {} updateProjectionMatrix() {} lookAt() {} rotateZ() {} },
-    BufferAttribute: class {},
-    BufferGeometry: class { setAttribute() {} setDrawRange() {} },
-    ShaderMaterial: class { constructor(options) { this.uniforms = options.uniforms; } },
-    Color: class { set(value) { window.fieldColors.push(value); } },
-    Vector2: Vector,
-    Vector3: Vector,
-    Group: class { position = { set: noop }; scale = { setScalar: noop }; rotation = {}; add() {} },
-    Line: class {},
-    NormalBlending: 'normal',
-    AdditiveBlending: 'add',
+// A scene that records what runField hands it, in place of a site's drawing.
+const recorder = `
+  window.scene = { styles: [], sizes: [], draws: [], disposed: false };
+  window.recordingScene = {
+    style: (style) => window.scene.styles.push(style),
+    resize: (width, height) => window.scene.sizes.push([width, height]),
+    draw: (time, delta) => window.scene.draws.push([time, delta]),
+    dispose: () => { window.scene.disposed = true; },
   };
 `;
 
@@ -63,10 +51,10 @@ async function render(page, { accent = '' } = {}) {
         <nav class="hs-footer-links" aria-label="Social"><a href="#gh" aria-label="GitHub"><svg viewBox="0 0 1 1"></svg></a></nav>
       </div>
     </footer>
-    <script>${fakeThree}</script>
-    <script type="module">${field}\nwindow.startField = startField;</script>
+    <script>${recorder}</script>
+    <script type="module">${field}\nObject.assign(window, { runField, resolveColor });</script>
   `);
-  await page.waitForFunction(() => typeof window.startField === 'function');
+  await page.waitForFunction(() => typeof window.runField === 'function');
 }
 
 const box = (page, selector) => page.locator(selector).first().boundingBox();
@@ -105,23 +93,10 @@ test.describe('the site shell', () => {
     expect((await box(page, '.hs-bar-link svg')).width).toBe(14);
   });
 
-  test('the motion button stays hidden without WebGL', async ({ page }) => {
+  test('the motion button stays hidden until a field runs', async ({ page }) => {
     await render(page);
-    const started = await page.evaluate(() =>
-      window.startField(
-        {
-          WebGLRenderer: class {
-            constructor() {
-              throw new Error('no WebGL');
-            }
-          },
-        },
-        document.querySelector('.hs-field'),
-        document.querySelector('.hs-motion'),
-      ),
-    );
-    expect(started).toBeUndefined();
     await expect(page.locator('.hs-motion')).toBeHidden();
+    await expect(page.locator('.hs-field')).not.toHaveClass(/hs-field--ready/);
   });
 
   test('the field starts paused for reduced motion, and its button toggles it', async ({
@@ -130,10 +105,10 @@ test.describe('the site shell', () => {
     // playwright.config sets reducedMotion: 'reduce'.
     await render(page);
     await page.evaluate(() =>
-      window.startField(
-        window.fakeThree,
+      window.runField(
         document.querySelector('.hs-field'),
         document.querySelector('.hs-motion'),
+        window.recordingScene,
       ),
     );
     const motion = page.locator('.hs-motion');
@@ -142,29 +117,66 @@ test.describe('the site shell', () => {
     await expect(motion).toHaveAttribute('data-hs-paused', 'true');
     await expect(page.locator('.hs-motion-play')).toBeVisible();
     await expect(page.locator('.hs-motion-pause')).toBeHidden();
+    await expect(page.locator('.hs-field')).toHaveClass(/hs-field--ready/);
+    // Paused, it draws one still frame and never moves.
+    const still = await page.evaluate(() => window.scene.draws);
+    expect(still.every(([, delta]) => delta === 0)).toBe(true);
 
     await motion.click();
     await expect(motion).toHaveAccessibleName('Pause motion');
     await expect(motion).toHaveAttribute('data-hs-paused', 'false');
     await expect(page.locator('.hs-motion-pause')).toBeVisible();
-    await expect(page.locator('.hs-field')).toHaveClass(/hs-field--ready/);
+    await page.waitForFunction(() => window.scene.draws.some(([, delta]) => delta > 0));
   });
 
-  test('the field draws in the accent, and refresh() follows a change', async ({ page }) => {
-    await render(page, { accent: ':root { --accent: #4ade80; }' });
-    const control = await page.evaluateHandle(() =>
-      window.startField(
-        window.fakeThree,
+  test('the scene is sized to the canvas and disposed when the canvas leaves', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await render(page);
+    await page.evaluate(() =>
+      window.runField(
         document.querySelector('.hs-field'),
         document.querySelector('.hs-motion'),
+        window.recordingScene,
       ),
     );
-    expect(await page.evaluate(() => window.fieldColors.at(-1))).toBe('rgb(74, 222, 128)');
+    expect(await page.evaluate(() => window.scene.sizes[0])).toEqual([1280, 720]);
 
-    await page.evaluate(() =>
-      document.querySelector('.hs-field').style.setProperty('--hs-field-color', '#0e7490'),
+    await page.locator('.hs-motion').click();
+    await page.evaluate(() => document.querySelector('.hs-field').remove());
+    await page.waitForFunction(() => window.scene.disposed);
+  });
+
+  test('the scene gets the accent, and refresh() follows a change', async ({ page }) => {
+    await render(page, { accent: ':root { --accent: #4ade80; }' });
+    const control = await page.evaluateHandle(() =>
+      window.runField(
+        document.querySelector('.hs-field'),
+        document.querySelector('.hs-motion'),
+        window.recordingScene,
+      ),
     );
+    expect(await page.evaluate(() => window.scene.styles.at(-1))).toEqual({
+      color: [74, 222, 128],
+      strength: 0.36,
+      blend: 'add',
+    });
+
+    await page.evaluate(() => {
+      const field = document.querySelector('.hs-field');
+      field.style.setProperty('--hs-field-color', '#0e7490');
+      field.style.setProperty('--hs-field-blend', 'normal');
+    });
     await control.evaluate((field) => field.refresh());
-    expect(await page.evaluate(() => window.fieldColors.at(-1))).toBe('rgb(14, 116, 144)');
+    expect(await page.evaluate(() => window.scene.styles.at(-1))).toEqual({
+      color: [14, 116, 144],
+      strength: 0.36,
+      blend: 'normal',
+    });
+  });
+
+  test('resolveColor reads relative colours', async ({ page }) => {
+    await render(page);
+    const color = await page.evaluate(() => window.resolveColor('rgb(from #4ade80 r g b / 50%)'));
+    expect(color).toEqual([74, 222, 128]);
   });
 });

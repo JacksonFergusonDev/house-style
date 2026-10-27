@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking:** each site draws its own hero field. `js/field.js` no longer draws the Dadras attractor with three.js; it exports `runField(canvas, button, scene)`, which runs a site's drawing under the motion rules (still for reduced motion, paused off screen or in a hidden tab, the pause button, the `hs-field--ready` fade-in) and hands it the canvas's `--hs-field-*` style. `afterLoad(start)` starts it after the page is up, and `resolveColor(value)` turns any CSS colour, relative colours included, into RGB channels. `startField` is removed.
+- **Breaking:** `astro/HeroField.astro` is removed, and with it the optional `three` peer dependency.
+
 ## 2.0.0
 
 - **Parts.** `parts.json` splits the release into `core` (fonts, tokens, components, icons, guidelines), `docs` (terminal, install box, recordings, extended fonts), `site`, and `astro`. `scripts/vendor.py` now requires `--parts` and copies only those parts plus core, so a documentation site no longer commits files it never loads. Node sites still install the whole release, which stays in `node_modules`.

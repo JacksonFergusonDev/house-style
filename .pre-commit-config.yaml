@@ -12,10 +12,13 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
+      - id: check-toml
 
   # Shared local and CI checks. CI runs this stage with --all-files.
   - repo: local
@@ -55,6 +58,30 @@ repos:
         pass_filenames: false
         files: ^(scripts/.*\.py|tests/unit/.*\.py|package(-lock)?\.json|\.pre-commit-config\.yaml)$
 
+      - id: ruff-check
+        name: Ruff lint
+        entry: ruff check scripts tests/unit
+        language: python
+        additional_dependencies: [ruff==0.17.2]
+        pass_filenames: false
+        files: ^(scripts/.*\.py|tests/unit/.*\.py|pyproject\.toml|\.pre-commit-config\.yaml)$
+
+      - id: ruff-format
+        name: Ruff format
+        entry: ruff format scripts tests/unit
+        language: python
+        additional_dependencies: [ruff==0.17.2]
+        pass_filenames: false
+        files: ^(scripts/.*\.py|tests/unit/.*\.py|pyproject\.toml|\.pre-commit-config\.yaml)$
+
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: python
+        additional_dependencies: [mypy==2.4.0]
+        pass_filenames: false
+        files: ^(scripts/.*\.py|tests/unit/.*\.py|pyproject\.toml|\.pre-commit-config\.yaml)$
+
       - id: browser-tests
         name: Browser tests (Chromium, Firefox, WebKit)
         entry: npm run test:browser
@@ -88,5 +115,12 @@ repos:
     rev: v0.2.73
     hooks:
       - id: rumdl
-        args: [--fix]
+        args: [--fix, .]
+        types: [file]
+        files: (\.md$|^(pyproject\.toml|\.pre-commit-config\.yaml)$)
+        pass_filenames: false
       - id: rumdl-fmt
+        args: [.]
+        types: [file]
+        files: (\.md$|^(pyproject\.toml|\.pre-commit-config\.yaml)$)
+        pass_filenames: false

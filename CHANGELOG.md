@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add pinned Ruff linting and formatting and strict mypy checks for the vendoring script and its tests, configured in `pyproject.toml` and run through the shared local and CI hooks.
+- Move the existing Markdown lint settings from `rumdl.toml` into `pyproject.toml`, preserving the rules and checking all Markdown files when the shared configuration changes.
+- Validate TOML files, symlinks, and executable shebangs in the shared hooks.
+
 ## 3.0.0
 
 - **Breaking:** each site draws its own hero field. `js/field.js` no longer draws the Dadras attractor with three.js; it exports `runField(canvas, button, scene)`, which runs a site's drawing under the motion rules (still for reduced motion, paused off screen or in a hidden tab, the pause button) and hands it the canvas's `--hs-field-*` style. `afterLoad(start)` starts it after the page is up, and `resolveColor(value)` turns any CSS colour, relative colours included, into RGB channels. `startField` is removed.

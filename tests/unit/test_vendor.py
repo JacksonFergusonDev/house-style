@@ -141,7 +141,14 @@ class VendorTests(unittest.TestCase):
                 elif edit == "missing":
                     (destination / "js" / "cast.js").unlink()
                 out, err = io.StringIO(), io.StringIO()
-                argv = [str(destination), "--tag", "v1.0.0", "--parts", "docs", "--check"]
+                argv = [
+                    str(destination),
+                    "--tag",
+                    "v1.0.0",
+                    "--parts",
+                    "docs",
+                    "--check",
+                ]
                 with (
                     mock.patch.object(vendor, "fetch_archive", return_value=archive),
                     contextlib.redirect_stdout(out),

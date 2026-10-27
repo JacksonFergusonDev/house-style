@@ -24,14 +24,21 @@ const LABELS = { pause: 'Pause motion', play: 'Play motion' };
 // The longest step a frame takes, so a stalled tab doesn't jump on return.
 const MAX_DELTA = 0.08;
 
+// The longest `afterLoad` waits for an idle moment. Chromium can leave an idle
+// callback unrun on a page that draws no new frames, so the field never started.
+const IDLE_TIMEOUT = 1000;
+
 /**
- * Calls `start` once the page has loaded and the browser is idle.
+ * Calls `start` once the page has loaded and the browser is idle, or a second
+ * after load at the latest.
  *
  * @param {() => void} start
  */
 export function afterLoad(start) {
   const idle = () =>
-    (window.requestIdleCallback ?? ((callback) => window.setTimeout(callback, 200)))(start);
+    window.requestIdleCallback
+      ? window.requestIdleCallback(start, { timeout: IDLE_TIMEOUT })
+      : window.setTimeout(start, 200);
   if (document.readyState === 'complete') idle();
   else window.addEventListener('load', idle, { once: true });
 }

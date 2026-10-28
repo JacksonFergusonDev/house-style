@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- `runField` survives a lost WebGL context. It asks the browser to restore the context, draws nothing while it's gone, and calls the scene's new optional `restore()` hook to rebuild its shaders and buffers before drawing again. Without this, a GPU reset left the hero blank until reload.
+- Header bar icons sit in `--muted` and turn the accent with their label on hover, as on jacksonferguson.me. Icons elsewhere keep the text's colour.
+- `icons/jacksonferguson.svg` is drawn in `currentColor`, so it dims and turns the accent like the other header icons, and works as `.hs-icon-jacksonferguson`. Its square no longer has a dark fill.
+- `.hs-bar-link-mark` sizes the jacksonferguson.me mark at 18px whether it's an inline SVG, an `<img>`, or an `.hs-icon`. `SiteBar` drew it at 14px.
+- `html/bar-home.html`: the header bar's link home to jacksonferguson.me, for sites without Astro to include as-is. `SiteBar` renders the same file.
+- `.hs-skip-link` and `.hs-visually-hidden` in `components.css`, from jacksonferguson.me and Star Ground.
+- `scripts/check_voice.py` flags em dashes and hype words in Markdown prose, from Protostar's docs checks. Run it by URL like `vendor.py`.
+
 ## 3.0.1
 
 - `afterLoad` starts the field within a second of load even when the browser never reports an idle moment. Chromium could leave the idle callback unrun on a page with no new frames to draw, so the field sometimes never started.

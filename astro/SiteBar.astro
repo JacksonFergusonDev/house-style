@@ -5,6 +5,8 @@
  * the link home to jacksonferguson.me.
  */
 import Icon from './Icon.astro';
+// The same markup a site without Astro includes, so the two can't drift apart.
+import homeLink from '../html/bar-home.html?raw';
 
 export interface BarLink {
   label: string;
@@ -47,10 +49,7 @@ const { name, logo, home = '/', nav = [], github } = Astro.props;
           </a>
         )
       }
-      <a class="hs-bar-link hs-wide" href="https://jacksonferguson.me/">
-        <Icon name="jacksonferguson" />
-        jacksonferguson.me
-      </a>
+      <Fragment set:html={homeLink} />
     </div>
   </div>
 </header>

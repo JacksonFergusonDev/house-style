@@ -12,7 +12,7 @@ house-style comes in parts, so a site takes only what it uses. `parts.json` list
 | --- | --- | --- |
 | **core**, every site | `css/tokens.css` | The palette (`--bg`, `--panel`, `--text`, `--muted`, `--subtle`, `--accent`, `--line`, `--grid`), the typefaces (`--sans`, `--mono`), the type scale (`--fs-*`), and the code surfaces (`--code-*`, `--prompt`). |
 |  | `css/fonts.css` | Self-hosted DM Sans (400 to 700) and JetBrains Mono (400). |
-|  | `css/components.css` | `.hs-section-marker` and `.hs-button` (with `.hs-button--primary`). |
+|  | `css/components.css` | `.hs-section-marker`, `.hs-button` (with `.hs-button--primary`), `.hs-skip-link`, and `.hs-visually-hidden`. |
 |  | `css/icons.css` | `.hs-icon hs-icon-<name>`: the icons in `icons/`, drawn in the text's color for pages that can't inline SVG. |
 |  | `icons/*.svg` | The house icons: arrows and other line icons, brand marks, and the jacksonferguson.me mark. |
 | **docs**, documentation | `css/fonts-extended.css` | Italic DM Sans and bold JetBrains Mono, for emphasis and highlighted code. |
@@ -20,8 +20,9 @@ house-style comes in parts, so a site takes only what it uses. `parts.json` list
 |  | `css/install.css` | `.hs-install`, an install command with a package-manager toggle and a copy button. |
 |  | `js/copy-command.js` | `initCopyCommands(root)`: wires the install box's tabs and copy buttons. |
 |  | `js/cast.js` | `castOptions()`, `mountCast(create, element)`, `loadSymbolsFont()`, `whenVisible(element, callback)`: plays a recording in a terminal window. |
-| **site**, a project site's shell | `css/site.css` | `.hs-bar` (the header bar), `.hs-hero` with `.hs-field` and its `.hs-motion` pause button, `.hs-jumps` (jump links), `.hs-grid` (the 80px section grid), and `.hs-footer`. |
-|  | `js/field.js` | `runField(canvas, button, scene)`, `afterLoad(start)`, `resolveColor(value)`: runs the hero's moving background, which each site draws itself, under the motion rules. |
+| **site**, a project site's shell | `css/site.css` | `.hs-bar` (the header bar, whose icons sit dimmer than their labels and turn the accent on hover), `.hs-hero` with `.hs-field` and its `.hs-motion` pause button, `.hs-jumps` (jump links), `.hs-grid` (the 80px section grid), and `.hs-footer`. |
+|  | `html/bar-home.html` | The header bar's link home to jacksonferguson.me, for a site to include as-is. `SiteBar` renders the same file. |
+|  | `js/field.js` | `runField(canvas, button, scene)`, `afterLoad(start)`, `resolveColor(value)`: runs the hero's moving background, which each site draws itself, under the motion rules, and restores it after a lost WebGL context. |
 | **astro**, Astro sites | `astro/*.astro` | `SiteBar`, `JumpLinks`, `SiteFooter`, `SectionMarker`, and `Icon`, rendering the markup the CSS above expects. |
 
 [GUIDELINES.md](GUIDELINES.md) holds the design and writing rules every site follows, such as which arrow a link takes and who each page is written for; each site's `AGENTS.md` points at the copy it uses. Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
@@ -80,6 +81,9 @@ afterLoad(() => {
     draw(time, delta) {
       /* draw a frame; delta is 0 for a still redraw */
     },
+    restore() {
+      /* rebuild shaders and buffers after a lost context comes back */
+    },
     dispose() {
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     },
@@ -87,7 +91,7 @@ afterLoad(() => {
 });
 ```
 
-Call the returned `refresh()` after the page's colour scheme changes.
+If the GPU resets or a phone reclaims memory, the WebGL context is lost. `runField` asks the browser to restore it and stops drawing until then; `restore()` rebuilds what the scene made on the old context. Call the returned `refresh()` after the page's colour scheme changes.
 
 ### A documentation site without Node (Zensical, MkDocs)
 
@@ -97,7 +101,7 @@ Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so t
 uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.1/scripts/vendor.py --tag v3.0.1 --parts docs,site docs/house
 ```
 
-It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.
+It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules. Include the header bar's link home rather than writing it out, so it matches every other site; with `pymdownx.snippets`, that is `--8<-- "docs/house/html/bar-home.html"` at the end of `.hs-bar-end`.
 
 ## Brand accents
 

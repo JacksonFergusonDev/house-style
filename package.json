@@ -26,6 +26,7 @@
     "./icons/*": "./icons/*",
     "./GUIDELINES.md": "./GUIDELINES.md",
     "./astro/*": "./astro/*",
+    "./html/*": "./html/*",
     "./parts.json": "./parts.json"
   },
   "files": [
@@ -34,6 +35,7 @@
     "fonts",
     "icons",
     "astro",
+    "html",
     "parts.json",
     "GUIDELINES.md"
   ],

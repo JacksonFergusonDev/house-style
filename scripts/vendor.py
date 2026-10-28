@@ -8,7 +8,7 @@ A documentation site such as Zensical serves only files under its docs folder,
 so it copies one tagged release there and commits it. Run this script from the
 same tag it vendors, so the rules for copying a release come from that release:
 
-    uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.1/scripts/vendor.py --tag v3.0.1 --parts docs,site docs/house
+    uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.1.0/scripts/vendor.py --tag v3.1.0 --parts docs,site docs/house
 
 A site copies only the parts it uses. ``parts.json`` in the release lists each
 part's files; ``core`` (fonts, tokens, components, icons, and the guidelines)

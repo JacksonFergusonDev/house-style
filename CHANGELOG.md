@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.1.0
 
 - `runField` survives a lost WebGL context. It asks the browser to restore the context, draws nothing while it's gone, and calls the scene's new optional `restore()` hook to rebuild its shaders and buffers before drawing again. Without this, a GPU reset left the hero blank until reload.
 - Header bar icons sit in `--muted` and turn the accent with their label on hover, as on jacksonferguson.me. Icons elsewhere keep the text's colour.

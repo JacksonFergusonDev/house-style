@@ -36,7 +36,7 @@ Depend on a tag. npm installs the whole release into `node_modules`, which isn't
 
 ```json
 "dependencies": {
-  "house-style": "github:JacksonFergusonDev/house-style#v3.0.0"
+  "house-style": "github:JacksonFergusonDev/house-style#v3.0.1"
 }
 ```
 
@@ -94,7 +94,7 @@ Call the returned `refresh()` after the page's colour scheme changes.
 Vendor a tag into the docs with `scripts/vendor.py`, run from that same tag so the rules for copying a release come from the release. Name the parts the site uses; core always comes along. It needs only [uv](https://docs.astral.sh/uv/), not a Python project:
 
 ```sh
-uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.0/scripts/vendor.py --tag v3.0.0 --parts docs,site docs/house
+uv run https://raw.githubusercontent.com/JacksonFergusonDev/house-style/v3.0.1/scripts/vendor.py --tag v3.0.1 --parts docs,site docs/house
 ```
 
 It writes those parts' files into `docs/house/`, renaming Markdown files to `.txt` so the docs don't build them as pages. Commit the result, and add `--check` in CI (Protostar pins the tag in its `justfile` and runs this through `just sync-house-style`) to fail when the copy differs from the tag. Reference the vendored files from the site's configuration, and load the scripts as ES modules.

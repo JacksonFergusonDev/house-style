@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.1
 
 - `afterLoad` starts the field within a second of load even when the browser never reports an idle moment. Chromium could leave the idle callback unrun on a page with no new frames to draw, so the field sometimes never started.
 - Add pinned Ruff linting and formatting and strict mypy checks for the vendoring script and its tests, configured in `pyproject.toml` and run through the shared local and CI hooks.

@@ -34,8 +34,8 @@
     ]
   },
   "site": {
-    "description": "A project site's shell: header bar, hero with the runner for its moving field, jump links, section grid, and footer.",
-    "files": ["css/site.css", "js/field.js"]
+    "description": "A project site's shell: header bar and its link home, hero with the runner for its moving field, jump links, section grid, and footer.",
+    "files": ["css/site.css", "js/field.js", "html/bar-home.html"]
   },
   "astro": {
     "description": "Astro components over core and site, for sites that install house-style with npm.",

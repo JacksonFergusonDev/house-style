@@ -15,6 +15,11 @@
  * The canvas's CSS sets the drawing's style: `--hs-field-color` (default the
  * accent), `--hs-field-strength` (0.36), and `--hs-field-blend` (`add` on dark
  * pages, `normal` on light ones). Call `refresh()` after changing them.
+ *
+ * A WebGL canvas can lose its context when the GPU resets or a phone reclaims
+ * memory. `runField` asks the browser to restore it, draws nothing while it's
+ * gone, and calls the scene's `restore()` to rebuild its shaders and buffers
+ * before drawing again.
  */
 
 // The button's visible text is its whole accessible name (WCAG 2.5.3), and it
@@ -48,7 +53,8 @@ export function afterLoad(start) {
  *
  * The scene draws; `runField` decides when. `draw(time, delta)` gets the
  * seconds the field has moved and those since the last frame, which is 0 when
- * it only redraws a still frame (paused, resized, or restyled).
+ * it only redraws a still frame (paused, resized, or restyled). `restore()`
+ * runs when a lost WebGL context comes back, before the next frame.
  *
  * @param {HTMLCanvasElement} canvas
  * @param {HTMLButtonElement} button
@@ -56,6 +62,7 @@ export function afterLoad(start) {
  *   style?(style: { color: [number, number, number], strength: number, blend: 'add' | 'normal' }): void,
  *   resize?(width: number, height: number): void,
  *   draw(time: number, delta: number): void,
+ *   restore?(): void,
  *   dispose?(): void,
  * }} scene
  * @returns {{ refresh(): void, dispose(): void } | undefined} Controls, or
@@ -70,6 +77,8 @@ export function runField(canvas, button, scene) {
   let frame = 0;
   let last = 0;
   let time = 0;
+  // The WebGL context is gone: nothing draws until the browser restores it.
+  let lost = false;
 
   function applyStyle() {
     const style = getComputedStyle(canvas);
@@ -96,6 +105,8 @@ export function runField(canvas, button, scene) {
     document.removeEventListener('visibilitychange', sync);
     reducedMotion.removeEventListener('change', onMotionChange);
     button.removeEventListener('click', toggle);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
+    canvas.removeEventListener('webglcontextrestored', onContextRestored);
     scene.dispose?.();
   }
 
@@ -103,7 +114,7 @@ export function runField(canvas, button, scene) {
     frame = 0;
     // Client-side navigation removed the page: free the drawing and stop.
     if (!canvas.isConnected) return dispose();
-    if (paused || !visible || document.hidden) return;
+    if (paused || !visible || document.hidden || lost) return;
     const delta = last ? Math.min((now - last) / 1000, MAX_DELTA) : 0;
     last = now;
     time += delta;
@@ -117,6 +128,7 @@ export function runField(canvas, button, scene) {
     button.dataset.hsPaused = String(paused);
     const text = button.querySelector('[data-hs-motion-label]');
     if (text) text.textContent = paused ? LABELS.play : LABELS.pause;
+    if (lost) return;
     scene.draw(time, 0);
     if (!paused && visible && !document.hidden) {
       last = 0;
@@ -134,11 +146,26 @@ export function runField(canvas, button, scene) {
     sync();
   }
 
+  function onContextLost(event) {
+    // Without this, the browser never restores the context.
+    event.preventDefault();
+    lost = true;
+    stop();
+  }
+
+  function onContextRestored() {
+    lost = false;
+    scene.restore?.();
+    applyStyle();
+    resize();
+    sync();
+  }
+
   applyStyle();
   resize();
   const sizes = new ResizeObserver(() => {
     resize();
-    scene.draw(time, 0);
+    if (!lost) scene.draw(time, 0);
   });
   sizes.observe(canvas);
   const observer = new IntersectionObserver(([entry]) => {
@@ -149,12 +176,14 @@ export function runField(canvas, button, scene) {
   button.addEventListener('click', toggle);
   reducedMotion.addEventListener('change', onMotionChange);
   document.addEventListener('visibilitychange', sync);
+  canvas.addEventListener('webglcontextlost', onContextLost);
+  canvas.addEventListener('webglcontextrestored', onContextRestored);
   sync();
 
   return {
     refresh() {
       applyStyle();
-      scene.draw(time, 0);
+      if (!lost) scene.draw(time, 0);
     },
     dispose,
   };

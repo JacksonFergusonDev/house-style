@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PARTS = json.loads((ROOT / "parts.json").read_text())
 # Everything a site uses; the rest (tests, scripts, tooling) stays here.
-SHIPPED = ("css", "js", "fonts", "icons", "astro")
+SHIPPED = ("css", "js", "fonts", "icons", "astro", "html")
 
 
 def _shipped() -> set[str]:
@@ -51,6 +51,14 @@ class PartsTests(unittest.TestCase):
             for url in re.findall(r"url\\('\\.\\./([^']+)'\\)", sheet.read_text()):
                 with self.subTest(stylesheet=path, url=url):
                     self.assertIn(_part_of(url)[0], {"core", part})
+
+
+class SnippetTests(unittest.TestCase):
+    def test_the_home_link_draws_the_mark_from_icons(self) -> None:
+        mark = (ROOT / "icons" / "jacksonferguson.svg").read_text()
+        snippet = (ROOT / "html" / "bar-home.html").read_text()
+        shapes = re.compile(r"<(?:rect|path)\b[^>]*/>")
+        self.assertEqual(shapes.findall(snippet), shapes.findall(mark))
 
 
 if __name__ == "__main__":

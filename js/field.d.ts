@@ -19,6 +19,11 @@ export interface FieldScene {
    * since the last frame, 0 when only redrawing a still frame.
    */
   draw(time: number, delta: number): void;
+  /**
+   * Rebuilds the drawing's GPU resources (shaders, buffers, textures) when a
+   * lost WebGL context comes back. `runField` redraws after it returns.
+   */
+  restore?(): void;
   /** Frees the drawing, e.g. the GPU context. */
   dispose?(): void;
 }

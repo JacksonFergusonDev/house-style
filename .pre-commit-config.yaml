@@ -82,12 +82,18 @@ repos:
         pass_filenames: false
         files: ^(scripts/.*\.py|tests/unit/.*\.py|pyproject\.toml|\.pre-commit-config\.yaml)$
 
+      - id: writing-voice
+        name: Writing voice
+        entry: python3 scripts/check_voice.py
+        language: system
+        files: \.md$
+
       - id: browser-tests
         name: Browser tests (Chromium, Firefox, WebKit)
         entry: npm run test:browser
         language: system
         pass_filenames: false
-        files: ^(css/.*\.css|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(css/.*\.css|js/.*\.js|astro/.*\.astro|icons/.*\.svg|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
 
   # Validate workflows with the same check locally and in CI.
   - repo: https://github.com/rhysd/actionlint

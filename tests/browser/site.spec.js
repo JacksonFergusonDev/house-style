@@ -6,14 +6,16 @@ const css = (
   await Promise.all(['tokens', 'components', 'site'].map((n) => read(`css/${n}.css`)))
 ).join('\n');
 const field = await read('js/field.js');
+const home = await read('html/bar-home.html');
 
 // A scene that records what runField hands it, in place of a site's drawing.
 const recorder = `
-  window.scene = { styles: [], sizes: [], draws: [], disposed: false };
+  window.scene = { styles: [], sizes: [], draws: [], restores: 0, disposed: false };
   window.recordingScene = {
     style: (style) => window.scene.styles.push(style),
     resize: (width, height) => window.scene.sizes.push([width, height]),
     draw: (time, delta) => window.scene.draws.push([time, delta]),
+    restore: () => { window.scene.restores += 1; },
     dispose: () => { window.scene.disposed = true; },
   };
 `;
@@ -30,7 +32,7 @@ async function render(page, { accent = '' } = {}) {
         </nav>
         <div class="hs-bar-end">
           <a class="hs-bar-link" href="#gh"><svg viewBox="0 0 1 1"></svg>GitHub</a>
-          <a class="hs-bar-link hs-wide" href="#home"><svg viewBox="0 0 1 1"></svg>Home</a>
+          ${home}
         </div>
       </div>
     </header>
@@ -91,6 +93,49 @@ test.describe('the site shell', () => {
     expect((await box(page, '.hs-jumps svg')).width).toBe(12);
     expect((await box(page, '.hs-footer-links svg')).width).toBe(16);
     expect((await box(page, '.hs-bar-link svg')).width).toBe(14);
+  });
+
+  test('header icons come before their labels, dimmed, and turn the accent on hover', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await render(page);
+    const color = (selector) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).color);
+    const tokens = await page.evaluate(() => {
+      const probe = (name) => {
+        const el = document.createElement('span');
+        el.style.color = `var(${name})`;
+        document.body.append(el);
+        const value = getComputedStyle(el).color;
+        el.remove();
+        return value;
+      };
+      return { muted: probe('--muted'), text: probe('--text'), accent: probe('--accent') };
+    });
+
+    for (const link of await page.locator('.hs-bar-link').all()) {
+      // The icon is the link's first child, so it reads before the label.
+      expect(await link.evaluate((el) => el.firstElementChild?.tagName.toLowerCase())).toBe('svg');
+    }
+    expect(await color('.hs-bar-link')).toBe(tokens.text);
+    expect(await color('.hs-bar-link svg')).toBe(tokens.muted);
+    expect(await color('.hs-bar-link-mark')).toBe(tokens.muted);
+
+    await page.locator('.hs-bar-link-mark').hover();
+    expect(await color('.hs-bar-link-mark')).toBe(tokens.accent);
+    await page.locator('.hs-bar-link').first().hover();
+    expect(await color('.hs-bar-link svg')).toBe(tokens.accent);
+  });
+
+  test('the jacksonferguson.me mark is 18px', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await render(page);
+    const mark = await box(page, '.hs-bar-link-mark');
+    expect([mark.width, mark.height]).toEqual([18, 18]);
   });
 
   test('the motion button stays hidden until a field runs', async ({ page }) => {
@@ -170,6 +215,39 @@ test.describe('the site shell', () => {
       strength: 0.36,
       blend: 'normal',
     });
+  });
+
+  test('a lost WebGL context stops drawing until the scene restores it', async ({ page }) => {
+    await render(page);
+    await page.evaluate(() =>
+      window.runField(
+        document.querySelector('.hs-field'),
+        document.querySelector('.hs-motion'),
+        window.recordingScene,
+      ),
+    );
+    await page.locator('.hs-motion').click();
+    await page.waitForFunction(() => window.scene.draws.some(([, delta]) => delta > 0));
+
+    // The browser restores a lost context only if the page cancels the event.
+    const cancelled = await page.evaluate(() => {
+      const event = new Event('webglcontextlost', { cancelable: true });
+      document.querySelector('.hs-field').dispatchEvent(event);
+      return event.defaultPrevented;
+    });
+    expect(cancelled).toBe(true);
+    const drawn = await page.evaluate(() => window.scene.draws.length);
+    // Pausing and playing while it's lost draws nothing either.
+    await page.locator('.hs-motion').click();
+    await page.locator('.hs-motion').click();
+    await page.evaluate(() => new Promise((done) => setTimeout(done, 200)));
+    expect(await page.evaluate(() => window.scene.draws.length)).toBe(drawn);
+
+    await page.evaluate(() =>
+      document.querySelector('.hs-field').dispatchEvent(new Event('webglcontextrestored')),
+    );
+    expect(await page.evaluate(() => window.scene.restores)).toBe(1);
+    await page.waitForFunction((count) => window.scene.draws.length > count + 1, drawn);
   });
 
   test('resolveColor reads relative colours', async ({ page }) => {

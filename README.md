@@ -27,7 +27,7 @@ house-style comes in parts, so a site takes only what it uses. `parts.json` list
 
 [GUIDELINES.md](GUIDELINES.md) holds the design and writing rules every site follows, such as which arrow a link takes and who each page is written for; each site's `AGENTS.md` points at the copy it uses. Each CSS file's header shows the markup it expects. Every class is prefixed `hs-` so it can't collide with a site's own styles or its documentation theme.
 
-Load the CSS in this order, before a site's own styles: `fonts.css`, `tokens.css`, `components.css`, then any other part's stylesheets. The files are plain CSS and ES modules with no build step; the Astro components are source the site's own build compiles.
+Load the CSS in this order, before a site's own styles: `fonts.css`, `tokens.css`, `components.css`, then any other part's stylesheets. Consumers receive plain CSS and compiled JavaScript ES modules without needing a house-style build step; the Astro components are source the site's own build compiles.
 
 ## Using it
 
@@ -137,12 +137,15 @@ Use Node.js 24 or newer and Python 3.12 or newer. Run `npm ci` to install the de
 npx playwright install chromium firefox webkit
 ```
 
-Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, Ruff linting and formatting, strict mypy type checking, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
+Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, Ruff linting and formatting, strict mypy and TypeScript checking, generated-file verification, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
 
 Unit tests live in `tests/unit/`; browser tests live in `tests/browser/`. Each runner explicitly targets its own suite:
 
 | Command | Check |
 | --- | --- |
+| `npm run build` | Strictly check `src/*.ts` and generate the committed JavaScript and declarations in `js/`. |
+| `npm run build:check` | Check TypeScript and verify that committed output matches the source without changing files. |
+| `npm run typecheck` | Check TypeScript without generating files. |
 | `npm test` | JavaScript unit tests. |
 | `npm run test:python` | Python unit tests for the vendoring script. |
 | `npm run test:browser` | Browser colors and interaction states at phone, tablet, and desktop widths in Chromium, Firefox, and WebKit. |
@@ -155,7 +158,9 @@ Browser hooks require the installed binaries and do not download them on every c
 
 Python checks are configured in `pyproject.toml` for Python 3.12. Ruff checks basic errors, unused code, import ordering, modern syntax, and common bugs, and formats Python at 88 columns with double quotes. Mypy checks the script and its tests in strict mode, including unreachable code. Run `prek run ruff-check --all-files`, `prek run ruff-format --all-files`, or `prek run mypy --all-files` individually. Each hook checks the whole Python suite when Python files or its configuration change. Prek installs the pinned tools in isolated environments; no Python project installation is needed.
 
-These tools are development dependencies; the shared files still have no build step, and `scripts/vendor.py` uses only Python's standard library.
+Author the shared scripts in `src/*.ts`. Run `npm run build` after changing them, and commit both the source and generated `js/*.js` and `js/*.d.ts` files. The build preserves the public JavaScript paths and generates declarations from the implementation. Local hooks and CI run `npm run build:check`, which checks types and rejects missing, stale, or unexpected output without rewriting files. Tests exercise the committed JavaScript that consumers receive.
+
+Generated output is committed because `scripts/vendor.py` downloads Git tag archives, rather than npm packages or release attachments. Both npm consumers and vendored sites continue using JavaScript without running a compiler. TypeScript and Prettier are development dependencies; `scripts/vendor.py` still uses only Python's standard library.
 
 Rumdl's Markdown rules also live in `pyproject.toml`, under `[tool.rumdl]`. Its lint and format hooks check all Markdown files when Markdown or the shared configuration changes. Gitleaks keeps `.gitleaks.toml` because it expects settings at the TOML root and does not support a `pyproject.toml` tool section. Prettier, Stylelint, ESLint, Playwright, and prek also retain their native configuration files.
 
@@ -163,7 +168,7 @@ Rumdl's Markdown rules also live in `pyproject.toml`, under `[tool.rumdl]`. Its 
 
 1. Change the files, and check each site that uses them against the change.
 1. Record changes in the `Unreleased` section of `CHANGELOG.md`. Several changes may share one release.
-1. When releasing, bump `version` in `package.json` and its lockfile, move the unreleased entries under the new version, and tag `vX.Y.Z`.
+1. When releasing, run `npm run build:check`, then bump `version` in `package.json` and its lockfile, move the unreleased entries under the new version, and tag `vX.Y.Z`.
 1. Update a consuming site in its own pull request only when explicitly requested or when the release fixes an issue affecting that site.
 
 Development tooling and contributor documentation changes do not require a release by themselves. Changes to shared assets, guidelines, or `scripts/vendor.py` reach consuming sites through a release. Renaming or removing a class, token, icon, or function requires a major version. A visible change to a value requires at least a minor version; other backward-compatible fixes use a patch version.

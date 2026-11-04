@@ -28,7 +28,7 @@ repos:
         entry: npx --no-install prettier --write --ignore-unknown
         language: system
         require_serial: true
-        files: \.(js|ts|css|json|md|yaml|yml)$
+        files: \.(js|mjs|ts|css|json|md|yaml|yml)$
 
       - id: eslint
         name: eslint
@@ -36,6 +36,7 @@ repos:
         language: system
         require_serial: true
         files: \.([jt]s|mjs|cjs)$
+        exclude: ^js/
 
       - id: stylelint
         name: stylelint
@@ -44,12 +45,19 @@ repos:
         require_serial: true
         files: \.css$
 
+      - id: typescript-build
+        name: TypeScript and generated JavaScript
+        entry: npm run build:check
+        language: system
+        pass_filenames: false
+        files: ^(src/.*\.ts|js/.*|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+
       - id: javascript-tests
         name: JavaScript tests
         entry: npm test
         language: system
         pass_filenames: false
-        files: ^(js/.*\.[jt]s|tests/unit/.*\.test\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(src/.*\.ts|js/.*\.[jt]s|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|tests/unit/.*\.test\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
 
       - id: python-tests
         name: Python tests
@@ -93,7 +101,7 @@ repos:
         entry: npm run test:browser
         language: system
         pass_filenames: false
-        files: ^(css/.*\.css|js/.*\.js|astro/.*\.astro|icons/.*\.svg|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(src/.*\.ts|css/.*\.css|js/.*\.js|astro/.*\.astro|icons/.*\.svg|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
 
   # Validate workflows with the same check locally and in CI.
   - repo: https://github.com/rhysd/actionlint

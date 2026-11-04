@@ -1,3 +1,4 @@
+// Generated from src/ by npm run build. Do not edit.
 /**
  * Wires every install box under `root` (see css/install.css).
  *
@@ -5,8 +6,6 @@
  * `aria-controls`. A button with `data-copy` copies that text, says so for a
  * moment, and then shows its original label again. Calling this again on the
  * same page binds nothing twice.
- *
- * @param {ParentNode} [root=document] Where to look for tabs and copy buttons.
  */
 export function initCopyCommands(root = document) {
   for (const tab of root.querySelectorAll('.hs-install-tab[data-command]')) {
@@ -20,7 +19,6 @@ export function initCopyCommands(root = document) {
     button.addEventListener('click', () => copy(button));
   }
 }
-
 function selectCommand(tab) {
   const tabs = tab.closest('[role="tablist"]')?.querySelectorAll('.hs-install-tab') ?? [tab];
   for (const other of tabs) {
@@ -28,7 +26,6 @@ function selectCommand(tab) {
     other.classList.toggle('is-active', isCurrent);
     other.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
   }
-
   const box = document.getElementById(tab.getAttribute('aria-controls') ?? '');
   if (!box) return;
   const command = tab.dataset.command ?? '';
@@ -40,7 +37,6 @@ function selectCommand(tab) {
   const button = box.querySelector('[data-copy]');
   if (button) button.dataset.copy = command;
 }
-
 async function copy(button) {
   const idle = button.dataset.hsIdle ?? button.innerHTML;
   button.dataset.hsIdle = idle;

@@ -1,3 +1,4 @@
+// Generated from src/ by npm run build. Do not edit.
 /**
  * Runs a hero's moving background: everything about it but the drawing.
  *
@@ -21,23 +22,17 @@
  * gone, and calls the scene's `restore()` to rebuild its shaders and buffers
  * before drawing again.
  */
-
 // The button's visible text is its whole accessible name (WCAG 2.5.3), and it
 // says what a press does; `data-hs-paused` picks the icon.
 const LABELS = { pause: 'Pause motion', play: 'Play motion' };
-
 // The longest step a frame takes, so a stalled tab doesn't jump on return.
 const MAX_DELTA = 0.08;
-
 // The longest `afterLoad` waits for an idle moment. Chromium can leave an idle
 // callback unrun on a page that draws no new frames, so the field never started.
 const IDLE_TIMEOUT = 1000;
-
 /**
  * Calls `start` once the page has loaded and the browser is idle, or a second
  * after load at the latest.
- *
- * @param {() => void} start
  */
 export function afterLoad(start) {
   const idle = () =>
@@ -47,7 +42,6 @@ export function afterLoad(start) {
   if (document.readyState === 'complete') idle();
   else window.addEventListener('load', idle, { once: true });
 }
-
 /**
  * Runs `scene` on `canvas`, with `button` as its pause control.
  *
@@ -56,21 +50,10 @@ export function afterLoad(start) {
  * it only redraws a still frame (paused, resized, or restyled). `restore()`
  * runs when a lost WebGL context comes back, before the next frame.
  *
- * @param {HTMLCanvasElement} canvas
- * @param {HTMLButtonElement} button
- * @param {{
- *   style?(style: { color: [number, number, number], strength: number, blend: 'add' | 'normal' }): void,
- *   resize?(width: number, height: number): void,
- *   draw(time: number, delta: number): void,
- *   restore?(): void,
- *   dispose?(): void,
- * }} scene
- * @returns {{ refresh(): void, dispose(): void } | undefined} Controls, or
- *   nothing when the canvas has left the page.
+ * Returns nothing when the canvas has left the page.
  */
 export function runField(canvas, button, scene) {
   if (!canvas.isConnected) return undefined;
-
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let paused = reducedMotion.matches;
   let visible = true;
@@ -79,7 +62,6 @@ export function runField(canvas, button, scene) {
   let time = 0;
   // The WebGL context is gone: nothing draws until the browser restores it.
   let lost = false;
-
   function applyStyle() {
     const style = getComputedStyle(canvas);
     scene.style?.({
@@ -88,16 +70,13 @@ export function runField(canvas, button, scene) {
       blend: style.getPropertyValue('--hs-field-blend').trim() === 'normal' ? 'normal' : 'add',
     });
   }
-
   function resize() {
     scene.resize?.(canvas.clientWidth || 1, canvas.clientHeight || 1);
   }
-
   function stop() {
     cancelAnimationFrame(frame);
     frame = 0;
   }
-
   function dispose() {
     stop();
     observer.disconnect();
@@ -109,7 +88,6 @@ export function runField(canvas, button, scene) {
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
     scene.dispose?.();
   }
-
   function tick(now) {
     frame = 0;
     // Client-side navigation removed the page: free the drawing and stop.
@@ -121,7 +99,6 @@ export function runField(canvas, button, scene) {
     scene.draw(time, delta);
     frame = requestAnimationFrame(tick);
   }
-
   function sync() {
     stop();
     button.hidden = false;
@@ -135,24 +112,20 @@ export function runField(canvas, button, scene) {
       frame = requestAnimationFrame(tick);
     }
   }
-
   function toggle() {
     paused = !paused;
     sync();
   }
-
   function onMotionChange() {
     paused = reducedMotion.matches;
     sync();
   }
-
   function onContextLost(event) {
     // Without this, the browser never restores the context.
     event.preventDefault();
     lost = true;
     stop();
   }
-
   function onContextRestored() {
     lost = false;
     scene.restore?.();
@@ -160,7 +133,6 @@ export function runField(canvas, button, scene) {
     resize();
     sync();
   }
-
   applyStyle();
   resize();
   const sizes = new ResizeObserver(() => {
@@ -179,7 +151,6 @@ export function runField(canvas, button, scene) {
   canvas.addEventListener('webglcontextlost', onContextLost);
   canvas.addEventListener('webglcontextrestored', onContextRestored);
   sync();
-
   return {
     refresh() {
       applyStyle();
@@ -188,13 +159,9 @@ export function runField(canvas, button, scene) {
     dispose,
   };
 }
-
 /**
  * Resolves any CSS colour (relative colours, `color-mix()`) to its RGB
  * channels, 0 to 255, through a probe element's computed colour.
- *
- * @param {string} value
- * @returns {[number, number, number]}
  */
 export function resolveColor(value) {
   const probe = document.createElement('span');

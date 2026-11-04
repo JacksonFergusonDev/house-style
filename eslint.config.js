@@ -3,15 +3,15 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default [
-  { ignores: ['node_modules/**', 'test-results/**', 'playwright-report/**'] },
+  { ignores: ['node_modules/**', 'test-results/**', 'playwright-report/**', 'js/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['js/**/*.js'],
+    files: ['src/**/*.ts'],
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['tests/**/*.js', '*.config.js'],
+    files: ['tests/**/*.js', '*.config.js', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
   {

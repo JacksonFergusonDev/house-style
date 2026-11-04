@@ -25,6 +25,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -33,7 +36,7 @@ jobs:
       - name: Resolve the locked Playwright image
         id: playwright-image
         run: |
-          version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
+          version=$(pnpm list @playwright/test --lockfile-only --json | node -p "JSON.parse(require('node:fs').readFileSync(0, 'utf8'))[0].devDependencies['@playwright/test'].version")
           tag="v${version}-noble"
           digest=$(curl --fail --silent --show-error --retry 3 --max-time 30 --head \
             --header 'Accept: application/vnd.docker.distribution.manifest.list.v2+json' \
@@ -59,11 +62,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '24'
-          cache: npm
+          cache: pnpm
 
       # setup-python's builds lack the ssl module inside the Playwright image, so
       # pip can't reach PyPI; uv's Python has it. The venv sits outside the
@@ -78,7 +84,7 @@ jobs:
 
       - name: Install development tools
         run: |
-          npm ci
+          pnpm install --frozen-lockfile
           uv pip install prek==0.5.7
 
       - name: Cache hook environments

@@ -1,4 +1,4 @@
-// Generated from src/ by npm run build. Do not edit.
+// Generated from src/ by pnpm run build. Do not edit.
 /**
  * Wires every install box under `root` (see css/install.css).
  *

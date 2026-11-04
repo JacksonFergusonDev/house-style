@@ -34,7 +34,7 @@ try {
       const filepath = join(output, name);
       const source = await readFile(join(temporary, name), 'utf8');
       const generated = await format(
-        '// Generated from src/ by npm run build. Do not edit.\n' + source,
+        '// Generated from src/ by pnpm run build. Do not edit.\n' + source,
         { ...(await resolveConfig(filepath)), filepath },
       );
       if (check) {
@@ -46,7 +46,7 @@ try {
     }
     if (check && (changed.length || stale.length)) {
       console.error(
-        `Generated files are out of date: ${[...changed, ...stale].join(', ')}. Run npm run build and commit js/.`,
+        `Generated files are out of date: ${[...changed, ...stale].join(', ')}. Run pnpm run build and commit js/.`,
       );
       process.exitCode = 1;
     } else if (!check) {

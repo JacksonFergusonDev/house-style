@@ -1,4 +1,4 @@
-// Generated from src/ by npm run build. Do not edit.
+// Generated from src/ by pnpm run build. Do not edit.
 /**
  * Helpers for terminal recordings in an `.hs-terminal-screen` (see
  * css/terminal.css). They take asciinema-player's `create` function rather

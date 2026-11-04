@@ -17,6 +17,8 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        # pnpm separates package-manager and project locks into YAML documents.
+        args: [--allow-multiple-documents]
       - id: check-json
       - id: check-toml
 
@@ -25,14 +27,14 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: npx --no-install prettier --write --ignore-unknown
+        entry: pnpm exec prettier --write --ignore-unknown
         language: system
         require_serial: true
         files: \.(js|mjs|ts|css|json|md|yaml|yml)$
 
       - id: eslint
         name: eslint
-        entry: npx --no-install eslint
+        entry: pnpm exec eslint
         language: system
         require_serial: true
         files: \.([jt]s|mjs|cjs)$
@@ -40,31 +42,31 @@ repos:
 
       - id: stylelint
         name: stylelint
-        entry: npx --no-install stylelint
+        entry: pnpm exec stylelint
         language: system
         require_serial: true
         files: \.css$
 
       - id: typescript-build
         name: TypeScript and generated JavaScript
-        entry: npm run build:check
+        entry: pnpm run build:check
         language: system
         pass_filenames: false
-        files: ^(src/.*\.ts|js/.*|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(src/.*\.ts|js/.*|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|package\.json|pnpm-lock\.yaml|\.pre-commit-config\.yaml)$
 
       - id: javascript-tests
         name: JavaScript tests
-        entry: npm test
+        entry: pnpm test
         language: system
         pass_filenames: false
-        files: ^(src/.*\.ts|js/.*\.[jt]s|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|tests/unit/.*\.test\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(src/.*\.ts|js/.*\.[jt]s|scripts/build\.mjs|tsconfig\.json|\.prettierrc\.json|tests/unit/.*\.test\.js|package\.json|pnpm-lock\.yaml|\.pre-commit-config\.yaml)$
 
       - id: python-tests
         name: Python tests
-        entry: npm run test:python
+        entry: pnpm run test:python
         language: system
         pass_filenames: false
-        files: ^(scripts/.*\.py|tests/unit/.*\.py|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(scripts/.*\.py|tests/unit/.*\.py|package\.json|pnpm-lock\.yaml|\.pre-commit-config\.yaml)$
 
       - id: ruff-check
         name: Ruff lint
@@ -98,10 +100,10 @@ repos:
 
       - id: browser-tests
         name: Browser tests (Chromium, Firefox, WebKit)
-        entry: npm run test:browser
+        entry: pnpm run test:browser
         language: system
         pass_filenames: false
-        files: ^(src/.*\.ts|css/.*\.css|js/.*\.js|astro/.*\.astro|icons/.*\.svg|tests/browser/.*\.js|playwright\.config\.js|package(-lock)?\.json|\.pre-commit-config\.yaml)$
+        files: ^(src/.*\.ts|css/.*\.css|js/.*\.js|astro/.*\.astro|icons/.*\.svg|tests/browser/.*\.js|playwright\.config\.js|package\.json|pnpm-lock\.yaml|\.pre-commit-config\.yaml)$
 
   # Validate workflows with the same check locally and in CI.
   - repo: https://github.com/rhysd/actionlint

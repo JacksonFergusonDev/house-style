@@ -17,7 +17,7 @@
     "test:python": "python3 -m unittest discover -s tests/unit",
     "format": "prettier --write \"**/*.{js,mjs,ts,css,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{js,mjs,ts,css,json,md,yaml,yml}\"",
-    "lint": "npm run lint:eslint && npm run lint:stylelint",
+    "lint": "pnpm run lint:eslint && pnpm run lint:stylelint",
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"css/**/*.css\"",
     "test:browser": "playwright test"
@@ -55,5 +55,6 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1"
-  }
+  },
+  "packageManager": "pnpm@12.16.1"
 }

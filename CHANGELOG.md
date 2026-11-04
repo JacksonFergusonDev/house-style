@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Clarify hero field startup: import drawing modules with the page, defer drawing through `afterLoad`, and prepare deterministic geometry at build time. This avoids an extra script request and repeated preparation before the field and motion control appear on refresh.
+- Author the shared scripts in strict TypeScript and generate the committed JavaScript and declarations at their existing paths. Consumers continue using JavaScript without a build step. Add build commands and local/CI checks that reject stale output.
 
 ## 3.1.0
 

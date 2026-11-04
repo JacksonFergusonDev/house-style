@@ -45,7 +45,8 @@ A site may add its own rules, but it never contradicts these. When a rule here i
 
 ## Motion and loading
 
-- **The first screen is text.** Nothing heavy (an image, a recording, a canvas, a library) holds up the first paint. Load it after the page is up, or when the reader scrolls toward it.
+- **The first screen is text.** Nothing heavy (an image, a recording, a canvas, a library) holds up the first paint. A hero's drawing module can download with the page as a nonblocking module, but canvas setup and drawing wait until the page is up. Load other heavy content after the page is up, or when the reader scrolls toward it.
+- **Prepare hero fields before starting them.** Load their drawing modules with the page, then start drawing through `afterLoad`. Do not put another script fetch inside that callback: it leaves a visible gap on refresh before the field and pause control appear. Prepare deterministic geometry at build time, so visitors do not repeat that work. Recordings and other content below the first screen still load on approach.
 - **Background motion is texture, not a centerpiece.** An animated field behind a hero uses dark, subdued shades of the site's accent, sits well below the text in contrast, and never competes with it.
 - **Motion can be stopped.** Anything that moves on its own for more than a few seconds has a visible pause control, stops when it's off screen or the tab is hidden, and stays still for readers who asked for reduced motion.
 

@@ -51,7 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
-      image: ${{ needs.setup.outputs.playwright-image }}
+      # The setup job resolves the image digest and validates its SHA-256 format.
+      image: ${{ needs.setup.outputs.playwright-image }} # zizmor: ignore[unpinned-images]
       options: --init --ipc=host
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

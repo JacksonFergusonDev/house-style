@@ -137,7 +137,9 @@ Use Node.js 24 or newer and Python 3.12 or newer. Run `npm ci` to install the de
 npx playwright install chromium firefox webkit
 ```
 
-Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, Ruff linting and formatting, strict mypy and TypeScript checking, generated-file verification, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
+Run `prek run --all-files` to check the whole repository. GitHub Actions runs this same command on pull requests and pushes to `main`, using the checks defined in `.pre-commit-config.yaml`: generic file checks, Prettier, ESLint, Stylelint, Ruff linting and formatting, strict mypy and TypeScript checking, generated-file verification, JavaScript and Python unit tests, Playwright in all three browser engines, actionlint, zizmor, secret scanning, and Markdown linting and formatting. Local hooks select checks for the changed files; CI checks all files. Both environments fail if a formatter changes a file. The commit-message hook runs separately when committing locally.
+
+Run `prek run zizmor --all-files` to check GitHub Actions security locally. The pinned hook scans the repository in offline mode, including workflows and hook configuration, without GitHub API access. CI runs the same hook through its existing prek step.
 
 Unit tests live in `tests/unit/`; browser tests live in `tests/browser/`. Each runner explicitly targets its own suite:
 

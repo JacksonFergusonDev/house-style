@@ -109,6 +109,14 @@ repos:
     hooks:
       - id: actionlint
 
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.31.1
+    hooks:
+      - id: zizmor
+        args: [--offline, --no-progress, --strict-collection, .]
+        pass_filenames: false
+        files: (^|/)(\.github/(workflows/[^/]+|dependabot|zizmor)\.ya?ml|action\.ya?ml|\.pre-commit-(config|hooks)\.ya?ml)$
+
   # Check for accidental commits of secrets
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1

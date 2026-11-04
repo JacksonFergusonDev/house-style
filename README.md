@@ -91,6 +91,8 @@ afterLoad(() => {
 });
 ```
 
+Import the drawing module with the page, as above; defer its startup, rather than its download. An `import()` inside `afterLoad` adds a network round trip after the page is visible, making the field and pause button pop back in on refresh. Compute deterministic geometry at build time so the callback only creates the drawing resources and starts `runField`. The browser must recreate a canvas on a full reload, but startup should not wait for another script download or repeat a layout search.
+
 If the GPU resets or a phone reclaims memory, the WebGL context is lost. `runField` asks the browser to restore it and stops drawing until then; `restore()` rebuilds what the scene made on the old context. Call the returned `refresh()` after the page's colour scheme changes.
 
 ### A documentation site without Node (Zensical, MkDocs)

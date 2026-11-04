@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Clarify hero field startup: import drawing modules with the page, defer drawing through `afterLoad`, and prepare deterministic geometry at build time. This avoids an extra script request and repeated preparation before the field and motion control appear on refresh.
+
 ## 3.1.0
 
 - `runField` survives a lost WebGL context. It asks the browser to restore the context, draws nothing while it's gone, and calls the scene's new optional `restore()` hook to rebuild its shaders and buffers before drawing again. Without this, a GPU reset left the hero blank until reload.
